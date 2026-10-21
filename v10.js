@@ -17,25 +17,16 @@
     const submit=form.querySelector('button[type=submit]');
     submit.before(block);
     block.querySelector('#diamondSchool').oninput=e=>school=sanitize(e.target.value);
-    block.querySelectorAll('[name=amateurPath]').forEach(r=>r.onchange=e=>{if(e.target.checked){route=e.target.value;block.querySelector('#diamondDraftHint').textContent=route==='college'?'대학 야구 3시즌 성장이 반영되고 2029년에 프로에 데뷔합니다.':'선택한 팀은 드래프트 지명 구단으로 기록됩니다. 지명 순번은 유망주 평가에 따라 달라집니다.';}});
+    block.querySelectorAll('[name=amateurPath]').forEach(r=>r.onchange=e=>{if(e.target.checked){route=e.target.value;block.querySelector('#diamondDraftHint').textContent=route==='college'?'대학 3시즌 36경기를 직접 진행하고 입단 구단을 선택합니다.':'선택한 팀은 드래프트 지명 구단으로 기록됩니다. 지명 순번은 유망주 평가에 따라 달라집니다.';}});
     // Registered after the base submit handler: this runs only when the player is newly created.
     form.addEventListener('submit',()=>{
       if(!state || state.game!==0 || state.career.length!==0 || state.v10?.amateur)return;
       const name=state.name,srcSchool=school||'무명 고교',seed=seedValue(name+srcSchool+state.position);
       const history=[{stage:'high-school',year:2025,label:srcSchool+' 졸업',achievement:pseudo(seed,1)>=80?'전국대회 우수 선수':'지역 유망주'}];
-      if(route==='college'){
-        for(let year=2026;year<=2028;year++){
-          const gain=1+pseudo(seed,year)%3;
-          const attrIndex=pseudo(seed,year+11)%6;
-          state.attributes[attrIndex]=Math.min(state.potential,state.attributes[attrIndex]+gain);
-          history.push({stage:'college',year,label:'대학 야구 '+(year-2025)+'학년',achievement:['주전 경쟁','정규 시즌 활약','전국대회 도전'][year-2026],growth:gain,attribute:attrIndex});
-        }
-        state.age=21;state.year=2029;state.league=null;
-      }
       const grade=Math.max(1,Math.min(10,Math.floor((101-state.potential)/6)+1));
-      history.push({stage:'draft',year:state.year,label:state.team+' 신인 드래프트 '+grade+'라운드 지명',achievement:route==='college'?'대졸 신인':'고졸 신인'});
-      state.v10={amateur:{school:srcSchool,path:route,history,draftRound:grade,debutAge:state.age,debutYear:state.year}};
-      state.events.unshift(state.team+' '+grade+'라운드 지명 · '+(route==='college'?'대학 졸업 후':'고교 졸업 후')+' 프로 입단!');
+      if(route!=='college')history.push({stage:'draft',year:state.year,label:state.team+' 신인 드래프트 '+grade+'라운드 지명',achievement:route==='college'?'대졸 신인':'고졸 신인'});
+      state.v10={amateur:{school:srcSchool,path:route,history,draftRound:grade,debutAge:route==='college'?21:state.age,debutYear:route==='college'?2029:state.year}};
+      if(route!=='college')state.events.unshift(state.team+' '+grade+'라운드 지명 · '+(route==='college'?'대학 졸업 후':'고교 졸업 후')+' 프로 입단!');
       state.events=state.events.slice(0,12);
       // Recreate league standings for the correct debut year.
       if(typeof ensureLeague==='function'){state.league=null;ensureLeague();}

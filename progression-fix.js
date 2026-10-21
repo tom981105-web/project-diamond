@@ -21,6 +21,17 @@
     render();
   }
   play=managedPlay;
+  const advanceSeason=nextSeason;
+  nextSeason=function(){
+    // Retirement closes this season; it must not sign a new contract first.
+    if(state&&!state.retired&&state.game===144&&state.age>=40){
+      state.retired=true;
+      state.events.unshift(state.age+'세에 은퇴했습니다. 커리어 기록을 보관합니다.');
+      state.events=state.events.slice(0,12);save();render();return;
+    }
+    return advanceSeason();
+  };
+
   window.DiamondDiagnostics=Object.freeze({
     version:'0.9.1',
     verify(){

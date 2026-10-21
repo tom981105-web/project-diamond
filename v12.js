@@ -6,14 +6,18 @@
  function enabled(){return !!(state?.v12?.college && !state.v12.college.completed);}
  function setupCollege(){
   if(!state?.v10?.amateur || state.v10.amateur.path!=='college' || state.v12)return;
-  // V1.0 used to award college growth immediately; reverse it before playable college seasons.\n  for(const year of state.v10.amateur.history||[]){if(year.stage==='college'&&Number.isInteger(year.attribute)&&Number.isFinite(year.growth)){state.attributes[year.attribute]=Math.max(1,state.attributes[year.attribute]-year.growth);}}\n  state.v12={college:{completed:false,yearIndex:0,game:0,results:[],offers:[],selection:0}};
+  // Only new careers enter here. Previously played pro saves are never rewound.
+  state.v12={college:{completed:false,yearIndex:0,game:0,results:[],offers:[],selection:0}};
   state.year=2026;state.age=18;state.game=0;state.league=null;
   state.events.unshift('대학 야구에 입학했습니다. 3시즌 동안 직접 경기를 진행하세요.');
   save();render();
  }
  function rand(seed){let n=0;for(const c of seed)n=(Math.imul(n,31)+c.charCodeAt(0))>>>0;return (n%10000)/10000;}
  function playCollege(n){
+  if(!Number.isFinite(n)||n<=0)return;
+  n=Math.floor(n);
   const c=state.v12.college;
+  if(c.yearIndex>=3)return;
   for(let k=0;k<n && c.yearIndex<3;k++){
    if(c.game===COLLEGE_GAMES){c.yearIndex++;c.game=0;if(c.yearIndex>=3)break;}
    const yr=2026+c.yearIndex;
@@ -26,12 +30,13 @@
      :{IPouts:good?18:12,ER:good?1:4,PK:good?7:3,W:good?1:0};
    c.results.push({year:yr,game:c.game+1,...line});
    c.game++;
+   state.year=yr;state.age=18+c.yearIndex;
    if(c.game%4===0){
     const idx=(c.yearIndex+c.game/4)%6;
     state.attributes[idx]=Math.min(state.potential,state.attributes[idx]+1);
    }
   }
-  if(c.yearIndex===2&&c.game===COLLEGE_GAMES){
+  if(c.results.length===36){
    c.yearIndex=3;c.offers=makeOffers();
    state.events.unshift('대학 커리어 종료! 프로 입단 구단을 선택하세요.');
   }
@@ -59,8 +64,12 @@
   c.selection=i;c.completed=true;
   state.year=2029;state.age=21;state.game=0;state.team=offer.team;
   state.league=null;state.current=empty();
+  if(state.globalCareer){state.globalCareer.region='KR';state.globalCareer.debutYear=2029;}
   if(state.development){state.development.salary=offer.salary;state.development.offers=[];}
   const amateur=state.v10.amateur;
+  amateur.history=amateur.history.filter(x=>x.stage!=='college');
+  for(let year=2026;year<=2028;year++)amateur.history.push({stage:'college',year,label:'대학 야구 '+(year-2025)+'학년',achievement:'실전 12경기 완료'});
+  if(!amateur.history.some(x=>x.stage==='draft'))amateur.history.push({stage:'draft',year:2029,achievement:'대졸 신인'});
   amateur.draftRound=offer.round;
   const record=amateur.history.find(x=>x.stage==='draft');
   if(record){record.label=offer.team+' 신인 드래프트 '+offer.round+'라운드 지명';record.year=2029;}
@@ -85,17 +94,21 @@
   const c=state.v12.college,done=c.yearIndex>=3;
   const root=document.createElement('section');root.id='diamondCollege';root.className='panel';
   let html='<h2>🎓 대학 야구 커리어</h2><p class="notice">'+(done?'대학 3시즌 완료 · 구단 계약 선택':(2026+c.yearIndex)+'년 '+(c.game)+' / '+COLLEGE_GAMES+'경기')+'</p>';
+  html+='<p class="muted">'+escapeHtml(state.name)+' · '+state.age+'세 · 종합 '+overall()+'</p><div class="row"><button type="button" id="collegeBackup" class="secondary small">대학 기록 백업 ↓</button><button type="button" id="collegeImport" class="secondary small">기록 가져오기 ↑</button></div>';
   if(!done)html+='<div class="row"><button type="button" id="collegeOne">1경기 진행</button><button type="button" class="secondary" id="collegeFour">4경기 진행</button><button type="button" class="secondary" id="collegeYear">이번 대학 시즌 끝까지</button></div>';
   else html+='<h3>드래프트 구단 제안</h3><div class="diamond-college-offers">'+c.offers.map((x,i)=>'<button type="button" class="secondary" data-offer="'+i+'">'+escapeHtml(x.team)+' · '+x.round+'라운드 · '+x.salary.toLocaleString()+'만원</button>').join('')+'</div>';
   html+='<p class="muted">스카우트 점수 '+rating()+' / 100 · 누적 출전 '+c.results.length+'경기</p><p class="muted">대학 3시즌을 마친 뒤 구단을 선택하면 2029년 프로 시즌이 시작됩니다. 대학 경기 결과는 프로 통계에 포함되지 않습니다.</p>';
   root.innerHTML=html;
   const game=document.getElementById('game');game.prepend(root);
+  document.getElementById('diamondSlots')?.before(root);
   const nav=document.getElementById('diamondNav');if(nav)nav.classList.add('hidden');
   game.querySelector('.layout')?.classList.add('hidden');
   for(const p of ['leaguePane','v4Pane','v5Pane','v6Pane','developmentPane','diamondV9','diamondAmateurHistory','diamondScouting'])document.getElementById(p)?.classList.add('hidden');
+  document.getElementById('collegeBackup').onclick=()=>exportSave();
+  document.getElementById('collegeImport').onclick=()=>document.getElementById('importFile').click();
   const b=document.getElementById('collegeOne');if(b)b.onclick=()=>playCollege(1);
   const f=document.getElementById('collegeFour');if(f)f.onclick=()=>playCollege(4);
-  const y=document.getElementById('collegeYear');if(y)y.onclick=()=>playCollege(COLLEGE_GAMES-c.game);
+  const y=document.getElementById('collegeYear');if(y)y.onclick=()=>playCollege(c.game===COLLEGE_GAMES?COLLEGE_GAMES:COLLEGE_GAMES-c.game);
   root.querySelectorAll('[data-offer]').forEach(el=>el.onclick=()=>sign(Number(el.dataset.offer)));
  }
  function cleanup(){

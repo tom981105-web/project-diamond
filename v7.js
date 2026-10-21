@@ -2,7 +2,7 @@
 'use strict';
 window.__diamondSlotsEnabled=true;
 (() => {
- const DB='project-diamond-slot-manager', STORE='slots', META='diamond-active-slot-v07', LEGACY='project-diamond-save-v1';
+ const DB='project-diamond-slot-manager', STORE='slots', META='diamond-active-slot-v07', MIGRATED='diamond-slots-migrated-v07', LEGACY='project-diamond-save-v1';
  let activeId='slot-1', booting=true, busy=false, dbPromise=null, sync=Promise.resolve();
  const byId=id=>document.getElementById(id);
  function openDb(name=DB,version=1){
@@ -51,7 +51,7 @@ window.__diamondSlotsEnabled=true;
   byId('diamondNew').onclick=async()=>{const ids=await allSlots();const free=Array.from({length:10},(_,i)=>'slot-'+(i+1)).find(x=>!ids.includes(x));if(!free){alert('최대 10명의 커리어를 보관할 수 있어요.');return;}await switchTo(free);};
   byId('diamondDelete').onclick=async()=>{
    if(!confirm('현재 슬롯의 커리어를 영구적으로 삭제할까요? 먼저 JSON 백업을 권장합니다.'))return;
-   try{await sync;await remove(activeId);const ids=await allSlots();activeId=ids[0]||'slot-1';state=(await get(activeId))?.data||null;try{localStorage.setItem(META,activeId);localStorage.removeItem(LEGACY);}catch(e){}if(state)oldSave();render();await updatePanel();}catch(e){alert('삭제 실패: '+e.message);}
+   try{await sync;await remove(activeId);try{localStorage.setItem(MIGRATED,'1');}catch(e){}const ids=await allSlots();activeId=ids[0]||'slot-1';state=(await get(activeId))?.data||null;try{localStorage.setItem(META,activeId);localStorage.removeItem(LEGACY);}catch(e){}if(state)oldSave();render();await updatePanel();}catch(e){alert('삭제 실패: '+e.message);}
   };
  }
  async function allSlots(){
@@ -101,10 +101,12 @@ window.__diamondSlotsEnabled=true;
    try{
     let chosen=null;try{chosen=localStorage.getItem(META);}catch(e){}
     const ids=await allSlots();
-    if(!ids.length){
+    let alreadyMigrated=false;try{alreadyMigrated=localStorage.getItem(MIGRATED)==='1';}catch(e){}
+    if(!ids.length&&!alreadyMigrated){
      const legacy=await legacyBackup();
      const restored=legacy?JSON.parse(legacy):loaded;
      if(isCareer(restored)){await put('slot-1',restored);chosen='slot-1';}
+     try{localStorage.setItem(MIGRATED,'1');}catch(e){}
     }
     activeId=/^slot-(10|[1-9])$/.test(chosen||'')?chosen:'slot-1';
     const row=await get(activeId);

@@ -6,7 +6,7 @@
  function enabled(){return !!(state?.v12?.college && !state.v12.college.completed);}
  function setupCollege(){
   if(!state?.v10?.amateur || state.v10.amateur.path!=='college' || state.v12)return;
-  state.v12={college:{completed:false,yearIndex:0,game:0,results:[],offers:[],selection:0}};
+  // V1.0 used to award college growth immediately; reverse it before playable college seasons.\n  for(const year of state.v10.amateur.history||[]){if(year.stage==='college'&&Number.isInteger(year.attribute)&&Number.isFinite(year.growth)){state.attributes[year.attribute]=Math.max(1,state.attributes[year.attribute]-year.growth);}}\n  state.v12={college:{completed:false,yearIndex:0,game:0,results:[],offers:[],selection:0}};
   state.year=2026;state.age=18;state.game=0;state.league=null;
   state.events.unshift('대학 야구에 입학했습니다. 3시즌 동안 직접 경기를 진행하세요.');
   save();render();

@@ -96,9 +96,11 @@
     ensureStatus();
     // Existing localStorage data is loaded synchronously by the original setup.
     // Restore larger backups only when that synchronous source has no valid career.
+    const bootState=state;
     readDB().then(record=>{
-      if(!record||state)return;
+      if(!record || state!==bootState)return;
       const restored=JSON.parse(record.data);
+      if(state && JSON.stringify(state)===record.data)return;
       if(!valid(restored))throw Error('유효하지 않은 이전 저장 파일');
       state=restored;
       render();

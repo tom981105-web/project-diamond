@@ -94,7 +94,8 @@
   setup=function(){
     oldSetup();
     ensureStatus();
-    if(window.__diamondSlotsEnabled) return; // V0.7 owns startup recovery to prevent slot races.\n    // Existing localStorage data is loaded synchronously by the original setup.
+    if(window.__diamondSlotsEnabled) return; // V0.7 manages startup recovery.
+    // Existing localStorage data is loaded synchronously by the original setup.
     // Restore larger backups only when that synchronous source has no valid career.
     const bootState=state;
     readDB().then(record=>{

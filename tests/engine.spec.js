@@ -30,3 +30,8 @@ test('sacrifice fly needs a runner on third and fewer than two outs; loaded walk
   });
   expect(result).toEqual([{AB:3,PA:3,RBI:0},{AB:4,PA:4,RBI:0},{AB:3,PA:4,RBI:1},{AB:3,PA:7,RBI:1}]);
 });
+
+test('release scripts use one cache version',async({page})=>{
+  const scripts=await page.locator('script[src]').evaluateAll(nodes=>nodes.map(n=>new URL(n.src).searchParams.get('v')));
+  expect(scripts.length).toBeGreaterThan(10);expect(new Set(scripts)).toEqual(new Set(['1.2.1']));
+});

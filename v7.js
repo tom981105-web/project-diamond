@@ -41,7 +41,7 @@ window.__diamondSlotsEnabled=true;
  function setMessage(message,err=false){const p=byId('diamondSlotsStatus');if(p){p.textContent=message;p.style.color=err?'#ffb4b4':'#aeeed0';}}
  function ensurePanel(){
   if(byId('diamondSlots'))return;
-  const parent=document.querySelector('#game .hero')||document.getElementById('game');
+  const parent=(state?document.querySelector('#game .hero'):document.getElementById('create'))||document.getElementById('game');
   if(!parent)return;
   const panel=document.createElement('section');
   panel.id='diamondSlots';panel.className='panel';
@@ -83,7 +83,7 @@ window.__diamondSlotsEnabled=true;
   const compare=byId('diamondSlotCompare');
   if(compare){compare.innerHTML=infos.length?'<h3>저장 선수 비교</h3><table><thead><tr><th>선수</th><th>유형</th><th>나이</th><th>소속</th><th>시즌</th></tr></thead><tbody>'+infos.map(x=>'<tr><td>'+escapeHtml(x.player.name)+'</td><td>'+(x.player.role==='batter'?'타자':'투수')+'</td><td>'+x.player.age+'</td><td>'+escapeHtml(x.player.team)+'</td><td>'+x.player.year+'</td></tr>').join('')+'</tbody></table>':'<p class="muted">아직 저장된 선수가 없습니다.</p>';}
  }
- render=function(){oldRender();if(state){ensurePanel();void updatePanel().catch(console.error);}else{byId('diamondSlots')?.remove();}};
+ render=function(){oldRender();ensurePanel();const panel=byId('diamondSlots');const target=(state?document.querySelector('#game .hero'):document.getElementById('create'));if(panel&&target&&panel.previousElementSibling!==target)target.after(panel);void updatePanel().catch(console.error);};
  // Starting a fresh career should create a new slot, not erase existing careers.
  startFresh=function(){
   void (async()=>{

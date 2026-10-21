@@ -22,7 +22,7 @@
  function syncReport(){
   if(!state?.v10?.amateur)return;
   const data=state.v10.amateur;
-  if(data.v11)return;
+  if(data.v11||data.path==='college')return;
   const scouting=simulate(data,state);
   data.v11=scouting;
   data.draftRound=scouting.draftRound;
@@ -40,6 +40,7 @@
   if(!panel){panel=document.createElement('section');panel.id='diamondScouting';panel.className='panel';document.getElementById('game').append(panel);}
   panel.dataset.diamondTab='career';
   const s=d.v11;
+  if(!s){panel.innerHTML='<h2>📋 아마추어 성적·스카우팅</h2><p class="muted">대학 실전 기록을 쌓으면 입단 시 평가가 확정됩니다.</p>';return;}
   const e=state.role==='batter';
   panel.innerHTML='<h2>📋 아마추어 성적·스카우팅</h2><p class="notice">평가 '+s.grade+' · '+s.score+'/100 · 신인 드래프트 '+s.draftRound+'라운드</p><p class="muted">'+escapeHtml(s.scoutNotes)+'</p><div class="tablewrap"><table><thead><tr><th>시즌</th><th>구분</th><th>경기</th>'+(e?'<th>타율</th><th>홈런</th><th>타점</th>':'<th>평균자책</th><th>탈삼진</th><th>승</th>')+'<th>평가</th></tr></thead><tbody>'+s.seasons.map(x=>'<tr><td>'+x.year+'</td><td>'+escapeHtml(x.stage)+'</td><td>'+x.games+'</td>'+(e?'<td>'+x.battingAverage+'</td><td>'+x.homeRuns+'</td><td>'+x.rbi+'</td>':'<td>'+x.era+'</td><td>'+x.strikeouts+'</td><td>'+x.wins+'</td>')+'<td>'+x.evaluation+'</td></tr>').join('')+'</tbody></table></div>';
   panel.classList.toggle('diamond-offscreen',(document.querySelector('#diamondNav .is-active')?.dataset.tab||'dashboard')!=='career');

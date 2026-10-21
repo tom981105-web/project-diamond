@@ -50,10 +50,10 @@
       const left=layout.querySelector('.stack:first-child');
       const right=layout.querySelector('.stack:last-child');
       if(left){
-        const children=[...left.children];
-        children.forEach((node,i)=>{
-          node.dataset.diamondTab=i===0||i===1||i===3?'dashboard':'career';
-        });
+        for(const node of left.children){
+          if(node.id==='diamondSlots')continue;
+          node.dataset.diamondTab=node.classList.contains('hero')||node.contains(document.getElementById('stats'))||node.contains(document.getElementById('events'))?'dashboard':'career';
+        }
       }
       if(right){
         [...right.children].forEach((node,i)=>{

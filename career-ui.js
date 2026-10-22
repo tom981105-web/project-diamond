@@ -19,10 +19,10 @@
   document.body.classList.toggle('creating-player',!state&&!$('create').classList.contains('hidden'));
   const selected=document.querySelector('.avatar-choice.selected');if(!selected)return;
   if(!$('avatarPreview'))document.querySelector('.avatar-grid').before(el('div','avatarPreview','','avatar-preview'));
-  face($('avatarPreview'),Number(selected.dataset.avatar),selected.innerHTML);
-  for(const button of document.querySelectorAll('.avatar-choice'))button.setAttribute('aria-pressed',String(button===selected));
+  face($('avatarPreview'),Number(selected.dataset.avatar),selected.querySelector('svg')?.outerHTML||'');
+  for(const button of document.querySelectorAll('.avatar-choice')){face(button,Number(button.dataset.avatar),button.querySelector('svg')?.outerHTML||'');button.setAttribute('aria-pressed',String(button===selected));}
  }
- function stageArt(index){const target=$('landingJourney').querySelector('.journey-placeholder');target.querySelector('img')?.remove();const src=window.DiamondVisualAssets?.milestones?.[index];if(typeof src!=='string'||!src)return;const image=document.createElement('img');image.alt='야구 커리어 장면';image.className='journey-stage-image';image.onerror=()=>image.remove();image.src=src;target.append(image);}
+ function stageArt(index){const target=$('landingJourney').querySelector('.journey-placeholder');target.querySelector('img')?.remove();target.classList.remove('has-scene');const src=window.DiamondVisualAssets?.milestones?.[index];if(typeof src!=='string'||!src)return;const image=document.createElement('img');image.alt='야구 커리어 장면';image.className='journey-stage-image';target.classList.add('has-scene');image.onerror=()=>{image.remove();target.classList.remove('has-scene');};image.src=src;target.append(image);}
  function landing(){
   if($('landingJourney'))return;
   const section=el('section','landingJourney','<div class="journey-placeholder" aria-hidden="true"><span class="diamond-field"></span><span class="journey-ball">⚾</span></div><p id="landingJourneyCaption">첫 그라운드에 서는 날</p><div id="landingJourneySteps" aria-label="커리어 여정"></div>','landing-journey');

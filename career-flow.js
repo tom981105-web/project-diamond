@@ -26,7 +26,7 @@
   if(p.id==='moment'){$('inspectCareerEvent')?.click();return;}
   if(p.id==='review'){window.DiamondUI.openReview();return;}
   const id=p.id==='entry'?'diamondCollege':['direction','contract','retirement'].includes(p.id)?'seasonDecision':'seasonStory';
-  const node=$(id);node?.scrollIntoView({block:'start',behavior:'instant'});
+  const node=$(id);if(id==='seasonStory')window.scrollTo({top:0,behavior:'instant'});else node?.scrollIntoView({block:'start',behavior:'instant'});
   if(node){node.tabIndex=-1;node.focus({preventScroll:true});}
  }
  function row(id,title,detail,target,urgent=false){return '<button type="button" class="flow-task" id="'+id+'" data-flow-target="'+target+'"><span class="flow-task-icon">'+icon+'</span><span class="flow-task-copy"><strong>'+text(title)+(urgent?'<i class="task-dot" aria-label="확인 필요"></i>':'')+'</strong><small>'+text(detail)+'</small></span><span class="flow-chevron" aria-hidden="true">›</span></button>';}
@@ -67,6 +67,11 @@
   const story=section('seasonStory',$('screen-league'));$('screen-league').prepend(story);story.dataset.phase=p.id;
   const step=['review','direction','contract','retirement'].includes(p.id)?(p.id==='review'?0:p.id==='direction'?1:2):-1;
   story.innerHTML='<p class="flow-eyebrow">'+(step>=0?'다음 이야기':p.id==='moment'?'커리어의 전환점':state.year+' 시즌')+'</p><h2>'+text(p.title)+'</h2><p>'+text(p.detail)+'</p>'+(step>=0?'<ol class="flow-steps" aria-label="다음 시즌 준비 단계">'+['시즌 결산','육성 방향',p.id==='retirement'?'커리어 마무리':'계약과 진로'].map((label,i)=>'<li'+(i===step?' aria-current="step"':'')+' class="'+(i<step?'complete':'')+'"><span>'+(i<step?'✓':i+1)+'</span>'+label+'</li>').join('')+'</ol>':'');
+  if(['season','college','entry'].includes(p.id)){
+   const count=school()?state.v12.college.results.length:state.game,limit=school()?36:144;
+   const metrics=school()?[]:(state.role==='batter'?[['출장',state.current.G],['타율',state.current.AB?statline(state.current,state.role).AVG:'—'],['홈런',state.current.HR]]:[['등판',state.current.G],['평균자책점',state.current.IPouts?statline(state.current,state.role).ERA:'—'],['탈삼진',state.current.PK]]);
+   story.insertAdjacentHTML('beforeend','<div class="chapter-progress" aria-label="시즌 진행"><span>'+count+' / '+limit+'팀 경기</span><strong>'+Math.round(count/limit*100)+'%</strong><progress max="'+limit+'" value="'+count+'" aria-label="시즌 완료 경기"></progress></div>'+(metrics.length?'<div class="chapter-stats">'+metrics.map(([label,value])=>'<div><small>'+label+'</small><strong>'+text(value)+'</strong></div>').join('')+'</div>':''));
+  }
   if(p.id==='moment'||p.id==='review'){
    const button=document.createElement('button');button.id='seasonStoryAction';button.type='button';button.textContent=p.action;button.onclick=()=>go('season');story.append(button);
   }

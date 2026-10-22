@@ -153,7 +153,7 @@
   const status=d.injury?'재활 '+d.injury+'경기':d.level==='2군'?'2군 훈련':label(c.role||(e.score>=62?'starter':'reserve'));
   const names={practice:'선택 과제 훈련',defense:state.role==='batter'?'수비 집중':'변화구 집중',rest:'휴식',rehab:'재활'};
   const trainingTasks=[d.focus,d.secondaryFocus].filter((i,n,a)=>Number.isInteger(i)&&i>=0&&i<6&&a.indexOf(i)===n);
-  const descriptions={practice:trainingTasks.map(i=>FOCI[state.role][i][1]).join(' · ')+' · '+(d.intensity==='hard'?'강훈련':'일반 훈련'),defense:(state.role==='batter'?'수비':'변화구')+' 훈련에 집중',rest:'출전·훈련 없이 몸 상태 회복',rehab:'부상 기간 회복 · 프로 출전 없음'};
+  const descriptions={practice:trainingTasks.map(i=>ATTR[state.role][i]).join(' · ')+' · '+(d.intensity==='hard'?'강훈련':'일반 훈련'),defense:(state.role==='batter'?'수비':'변화구')+' 훈련에 집중',rest:'출전·훈련 없이 몸 상태 회복',rehab:'부상 기간 회복 · 프로 출전 없음'};
   const expanded=root.querySelector('#weeklyPlans')?.open||!!c.plan;
   let html='<div class="section-title-row"><h3>이번 시즌의 역할</h3><span class="roster-chip">'+escapeHtml(status)+'</span></div><div class="season-roster-rows"><div><span>소속</span><strong>'+escapeHtml(state.team)+' · '+escapeHtml(d.level)+'</strong></div><div><span>포지션</span><strong>'+escapeHtml(state.position)+'</strong></div></div>';
   if(c.pending){

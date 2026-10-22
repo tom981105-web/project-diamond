@@ -19,7 +19,7 @@
   const r=run;run=null;clearTimeout(timer);timer=null;
   if(preserve&&valid(r)){remaining(r);save();}
   if($('seasonProgressDialog')?.open)$('seasonProgressDialog').close();
-  if(r){render();if(valid(r)&&state.game<r.target){if(!state.career14?.pending&&window.DiamondStories22?.blocks())window.DiamondStories22.open();else $('seasonBtn')?.focus();}}
+  if(r){render();if(valid(r)){if(!state.career14?.pending&&window.DiamondStories22?.blocks())window.DiamondStories22.open();else if(state.game<r.target)$('seasonBtn')?.focus();}}
  }
  function paint(){
   const r=run;if(!r)return;

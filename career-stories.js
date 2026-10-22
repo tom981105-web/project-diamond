@@ -113,7 +113,7 @@
   n.pending=null;save();render();return true;
  }
  function disable(){const n=data();if(!n)return;if(pending()){record(pending(),null,'이야기 알림을 꺼 효과 없이 넘겼습니다.','skipped');n.pending=null;}n.enabled=false;save();render();}
- const changes=o=>(o.training?'집중 과제 '+o.training.map(i=>ATTR[state.role][i]).join(' · ')+' · ':'')+Object.entries(o.effect).map(([k,v])=>({trust:'구단 신뢰',cohesion:'팀 유대',morale:'사기',fatigue:'피로',condition:'컨디션'}[k]||k)+' '+(v>0?'+':'')+v).join(' · ')+(o.plan?' · 7경기 일반 훈련':'')||'현재 훈련과 상태 유지';
+ const changes=o=>[o.training?'집중 과제 '+o.training.map(i=>ATTR[state.role][i]).join(' · '):'',...Object.entries(o.effect).map(([k,v])=>({trust:'구단 신뢰',cohesion:'팀 유대',morale:'사기',fatigue:'피로',condition:'컨디션'}[k]||k)+' '+(v>0?'+':'')+v),o.plan?'7경기 일반 훈련':''].filter(Boolean).join(' · ')||'현재 훈련과 상태 유지';
  let context=null;
  function open(){const p=pending();if(!p)return;const d=$('storyDialog22');context={owner:state,id:p.id};const speaker=object(p.speaker)&&typeof p.speaker.name==='string'?p.speaker:null;
   const scenes={press:1,practice:0,'practice-followup':0,mentor:0,'mentor-followup':0,adapt:1,return:1},src=window.DiamondVisualAssets?.milestones?.[scenes[p.key]];

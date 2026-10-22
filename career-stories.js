@@ -32,12 +32,12 @@
   return candidates.find(s=>!n.seen.includes(s.key))||null;
  }
  function record(p,option,effect,status='chosen'){
-  const n=data();n.history.push({id:p.id,year:p.year,game:state.game,offeredAt:p.game,team:p.team,key:p.key,title:p.title,choice:option?.id||'skip',label:option?.label||'이번에는 넘기기',effect,status});n.history=n.history.slice(-400);
+  const n=data();n.history.push({id:p.id,year:p.year,game:state.game,offeredAt:p.game,team:p.team,key:p.key,title:p.title,...(p.speaker?{speaker:{...p.speaker}}:{}),choice:option?.id||'skip',label:option?.label||'이번에는 넘기기',effect,status});n.history=n.history.slice(-400);
  }
  function offer(n,initial=false){
   if(n.pending||n.offered>=3||state.game>=144||(!initial&&state.game-n.lastOffer<28))return;
   const s=situation(n);if(!s)return;
-  n.serial++;n.pending={...s,id:state.year+'-'+n.serial,year:state.year,game:state.game,team:state.team,blocking:initial||n.paused<2};
+  n.serial++;const speaker=window.DiamondPresentation?.speaker(s.key,state.team);n.pending={...s,...(speaker?{speaker}:{}),id:state.year+'-'+n.serial,year:state.year,game:state.game,team:state.team,blocking:initial||n.paused<2};
   n.seen.push(s.key);n.offered++;n.lastOffer=state.game;if(!initial&&n.pending.blocking)n.paused++;
  }
  function enable(){
@@ -81,8 +81,10 @@
  function disable(){const n=data();if(!n)return;if(pending()){record(pending(),null,'이야기 알림을 꺼 효과 없이 넘겼습니다.','skipped');n.pending=null;}n.enabled=false;save();render();}
  const changes=o=>Object.entries(o.effect).map(([k,v])=>({trust:'구단 신뢰',cohesion:'팀 유대',morale:'사기',fatigue:'피로',condition:'컨디션'}[k]||k)+' '+(v>0?'+':'')+v).join(' · ')+(o.plan?' · 7경기 일반 훈련':'');
  let context=null;
- function open(){const p=pending();if(!p)return;const d=$('storyDialog22');context={owner:state,id:p.id};const src=window.DiamondVisualAssets?.portraits?.[Number(state.ui13?.avatar)||0];
-  d.querySelector('.experience-body').innerHTML='<div class="story-speaker">'+(src?'<img src="'+text(src)+'" alt="나의 야구 선수">':'')+'<div><small>'+p.year+' · '+p.game+'팀 경기 · '+text(p.team)+'</small><h3>'+text(p.title)+'</h3></div></div><p>'+text(p.detail)+'</p><div class="life-options">'+p.options.map(o=>'<button type="button" data-story-choice="'+text(o.id)+'" '+(unavailable(o)?'disabled':'')+'><strong>'+text(o.label)+'</strong><small>'+text(changes(o))+'</small>'+(unavailable(o)?'<small>'+text(unavailable(o))+'</small>':'')+'</button>').join('')+'</div><p class="decision-note">신뢰는 실제 기용 평가에, 팀 유대·사기는 경기 능력에 반영됩니다. 훈련 보상은 실제 훈련일을 채워야 지급됩니다. 선택 자체로 부상 기간이나 경기 기록을 바꾸지 않습니다.</p><button type="button" class="secondary" id="skipStory22" '+(state.career14?.pending?'disabled':'')+'>이번에는 넘기기</button>';
+ function open(){const p=pending();if(!p)return;const d=$('storyDialog22');context={owner:state,id:p.id};const speaker=object(p.speaker)&&typeof p.speaker.name==='string'?p.speaker:null;
+  const scenes={practice:0,'practice-followup':0,mentor:0,'mentor-followup':0,adapt:1,return:1},src=window.DiamondVisualAssets?.milestones?.[scenes[p.key]];
+  const quotes={practice:'오늘은 조금만 더 맞춰 볼까? 내일 일정도 있으니 무리하지는 말고.', 'practice-followup':'우리 같이 연습했던 장면을 찾아봤어. 이 영상부터 볼래?',mentor:'선배님은 경기에 나가기 전에 어떤 준비를 하세요?', 'mentor-followup':'같이 연습하고 나서 적어 둔 건데, 한번 봐 주실래요?',slump:'최근 기록을 같이 보자. 다음 훈련은 기본부터 점검하면 어떨까?',competition:'기회가 왔을 때 준비돼 있어야 해. 이번 주 과제를 같이 정해 보자.',rehab:'몸은 좀 어때? 급하게 돌아오려고 하지는 마.',return:'다시 시작하는 첫 주야. 몸 상태부터 천천히 확인하자.',adapt:'처음엔 누구나 낯설지. 궁금한 건 편하게 물어봐.'};
+  d.querySelector('.experience-body').innerHTML=(src?'<img class="story-scene" src="'+text(src)+'" alt="나의 야구 여정" loading="lazy">':'')+'<p class="story-context">'+p.year+' · '+p.game+'팀 경기 · '+text(p.team)+'</p><h3>'+text(p.title)+'</h3><p>'+text(p.detail)+'</p>'+(speaker?'<div class="story-conversation"><span class="speaker-mark" aria-hidden="true">'+text(speaker.name.slice(-2))+'</span><div><strong>'+text(speaker.name)+' <small>'+text(speaker.role)+'</small></strong><p>“'+text(quotes[p.key]||'다음 경기를 어떻게 준비할지 함께 생각해 보자.')+'”</p></div></div>':'')+'<div class="life-options">'+p.options.map(o=>'<button type="button" data-story-choice="'+text(o.id)+'" '+(unavailable(o)?'disabled':'')+'><strong>'+text(o.label)+'</strong><small>'+text(changes(o))+'</small>'+(unavailable(o)?'<small>'+text(unavailable(o))+'</small>':'')+'</button>').join('')+'</div><details class="story-rules"><summary>선택이 경기에 반영되는 방식</summary><p>신뢰는 기용 평가에, 팀 유대·사기는 경기 능력에 반영됩니다. 7경기 계획은 현재 집중 과제의 일반 훈련으로 진행하며 실제 훈련일에 성장을 계산합니다. 선택만으로 부상 기간이나 경기 기록이 바뀌지는 않습니다.</p></details><button type="button" class="secondary" id="skipStory22" '+(state.career14?.pending?'disabled':'')+'>이번에는 넘기기</button>';
   for(const b of d.querySelectorAll('[data-story-choice],#skipStory22'))b.onclick=()=>{if(context?.owner!==state||context.id!==pending()?.id){d.close();return;}if(resolve(context.id,b.dataset.storyChoice||'skip'))d.close();};if(!d.open)d.showModal();
  }
  function paint(){
@@ -90,7 +92,9 @@
   const modal=$('storyDialog22');if(!pro()){modal.close();context=null;}if(context&&(context.owner!==state||context.id!==pending()?.id)){modal.close();context=null;}
   let root=$('careerStory22');if(!root){root=document.createElement('section');root.id='careerStory22';root.className='surface-card';$('screen-league')?.append(root);}root.hidden=!pro();if(root.hidden)return;
   const n=data(),p=pending(),last=n?.history?.at(-1);(state.game>=144?$('seasonDecision'):blocks()?$('careerWeek')||$('seasonStory'):$('seasonActions')).after(root);
-  root.innerHTML='<p class="flow-eyebrow">선수 생활 · 라커룸 이야기</p><h3>'+text(p?.title||(!n?.enabled?'선택이 다음 이야기로 이어집니다':'다음 이야기를 쌓는 중'))+'</h3><p>'+text(p?p.detail:!n?.enabled?'이야기를 켜면 동료·코치와의 선택이 훈련과 관계에 남습니다. 기존 일정은 그대로 이어갈 수 있습니다.':'시즌 중 최대 두 번 일정을 멈춥니다. 매 사건은 28팀 경기 이상 간격으로 발생하며 넘길 수도 있습니다.')+'</p>'+(p&&n.enabled?'<button type="button" id="openStory22">이야기와 선택 확인</button>':!n?.enabled?'<button type="button" id="enableStories22" '+(state.game>=144||state.career14?.pending?'disabled':'')+'>이야기 진행 켜기</button>':'')+(last?'<div class="story-feedback" role="status"><strong>'+text(last.title)+' · '+text(last.label)+'</strong><p>'+text(last.effect)+'</p></div>':'')+(n?.enabled?'<button type="button" class="secondary small" id="disableStories22">이야기 알림 끄기</button>':'');
+  const blocked=blocks(),recent=last?'<details class="story-last-choice"><summary>최근 선택 · '+text(last.title)+'</summary><div class="story-feedback"><strong>'+text(last.label)+'</strong><p>'+text(last.effect)+'</p></div></details>':'';
+  root.classList.toggle('story-is-pending',blocked);
+  root.innerHTML=(blocked?'<p class="story-waiting">선택을 기다리며 '+(state.career14?.remaining||0)+'팀 경기 일정을 보관했습니다.</p>':'<p class="flow-eyebrow">라커룸 이야기</p><h3>'+text(p?.title||(!n?.enabled?'함께 뛰는 사람들의 이야기':'동료들과 다음 경기를 준비합니다'))+'</h3><p>'+text(p?p.detail:!n?.enabled?'동료·코치와 나눈 선택이 다음 훈련과 만남으로 이어집니다.':'시즌 중 최대 두 번 일정을 멈추며, 모든 사건은 28팀 경기 이상 간격으로 찾아옵니다.')+'</p>')+(p&&n.enabled?'<button type="button" id="openStory22"'+(blocked?' class="secondary"':'')+'>'+(blocked?'선택 화면 다시 열기':'이야기와 선택 확인')+'</button>':!n?.enabled?'<button type="button" id="enableStories22" '+(state.game>=144||state.career14?.pending?'disabled':'')+'>이야기 진행 켜기</button>':'')+recent+(n?.enabled?'<button type="button" class="secondary small" id="disableStories22">이야기 알림 끄기</button>':'');
   if($('openStory22'))$('openStory22').onclick=open;if($('enableStories22'))$('enableStories22').onclick=()=>{if(enable())open();};if($('disableStories22'))$('disableStories22').onclick=disable;
   if(blocks()&&!state.career14?.pending){for(const id of ['oneBtn','weekBtn','seasonBtn','continueCareer'])if($(id))$(id).disabled=true;}
  }

@@ -1,3 +1,7 @@
+# PROJECT DIAMOND V2.3
+
+실제 성적 중심의 시즌 화면, 장면과 대화가 있는 사건, 구단 관계·만남 기록, 간결한 계약 제안을 연결했습니다. [변경 내용과 저장 보호](docs/CAREER-PRESENTATION-V2.3.md)를 확인하세요.
+
 # PROJECT DIAMOND V2.2
 
 시즌 중 사건·동료와 코치의 후속 이야기·실제 훈련 계획·선택 기록을 연결했습니다. [진행·계산·저장 규칙](docs/SEASON-STORIES-V2.2.md)을 확인하세요.

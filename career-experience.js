@@ -40,7 +40,7 @@
  }
  function life(){
   const root=card('lifeChapter',$('screen-league'));root.hidden=school()||state.retired;const e=window.DiamondLife.episode(),choice=state.life20?.stories?.[state.year];
-  if(root.hidden){if($('longProject'))$('longProject').hidden=true;if($('careerShop'))$('careerShop').hidden=true;return;}$('seasonStory').after(root);
+  if(root.hidden){if($('longProject'))$('longProject').hidden=true;if($('careerShop'))$('careerShop').hidden=true;return;}($('seasonActions')||$('seasonStory')).after(root);
   if(choice)root.innerHTML='<p class="flow-eyebrow">이번 시즌의 선택</p><h3>'+text(choice.title)+'</h3><p>'+text(choice.effect)+'</p><p class="screen-intro">선택 결과를 저장했습니다. 이번 시즌에 다시 적용되지 않습니다.</p>';
   else root.innerHTML='<p class="flow-eyebrow">그라운드 밖의 하루 · 시즌당 한 번</p><h3>'+text(e.title)+'</h3><p>'+text(e.detail)+'</p><button type="button" id="openLifeMoment">이야기 확인하기</button>';
   if($('openLifeMoment'))$('openLifeMoment').onclick=openLife;
@@ -70,7 +70,7 @@
  function welcome(){
   const root=card('careerWelcome',$('screen-dashboard')),a=state.contract15?.active,signature=list(state.contract15?.history).at(-1)?.signature;
   root.hidden=school()||state.retired||state.game!==0||!a||a.startYear!==state.year;
-  if(root.hidden)return;$('homeNextCard').before(root);const first=['draft','college'].includes(a.source);
+  if(root.hidden)return;$('homeNextCard').after(root);const first=['draft','college'].includes(a.source);
   root.innerHTML='<p class="flow-eyebrow">'+(first?'프로 입단':'계약 확정')+'</p><h3>'+text(a.team)+'에서 시작하는 '+state.year+'년</h3><p>연봉 '+money(a.annualSalary)+' · '+a.endYear+'년까지'+(signature?' · 서명 완료':'')+'</p><button type="button" class="secondary small" id="openCareerScene">'+(first?'첫 유니폼의 순간':'새 출발의 순간')+'</button>';
   $('openCareerScene').onclick=()=>{const d=$('careerSceneDialog');d.querySelector('.experience-body').innerHTML=img(first?0:1,'새로운 팀에서 시작하는 야구 인생')+'<h3>'+text(state.name)+' · '+text(a.team)+'</h3><p>'+state.year+'년의 도전이 시작됩니다. 실제 기용은 능력과 몸 상태, 최근 성적에 따라 결정됩니다.</p>';d.showModal();};
  }

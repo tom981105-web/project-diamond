@@ -59,6 +59,10 @@
   }
   if($('coachPanel')){if(!$('playerCoachDetails'))$('screen-training').append(el('details','playerCoachDetails','<summary>기용 평가와 코치 조언 <span aria-hidden="true">⌄</span></summary>','surface-card'));$('playerCoachDetails').append($('coachPanel'));$('playerCoachDetails').hidden=$('coachPanel').hidden;}
   const heading=$('developmentPane')?.querySelector('h2');if(heading)heading.textContent='훈련과 몸 상태';
+  if(!$('playerCareerDetails'))$('screen-training').append(el('details','playerCareerDetails','<summary>리그와 해외 경력 <span aria-hidden="true">⌄</span></summary>','surface-card'));
+  if($('v5Pane'))$('playerCareerDetails').append($('v5Pane'));
+  $('playerCareerDetails').hidden=!!(state.v12?.college&&!state.v12.college.completed);
+
  }
  function decorate(){
   if(decorating)return;decorating=true;

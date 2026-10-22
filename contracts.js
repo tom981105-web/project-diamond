@@ -137,10 +137,10 @@
  function marketView(root){
   if(!root)return;offers();const m=market();if(!m){root.innerHTML='<p class="screen-intro">이번 시즌을 마치고 커리어를 정리합니다.</p>';return;}
   const e=m.evaluation,a=ensure().active;
-  let html='<div class="market-evaluation"><h3>'+(m.kind==='continue'?'기존 계약으로 다음 시즌':'이번 시즌 시장 평가')+'</h3>';
+  let html='<details class="market-evaluation"><summary>'+(m.kind==='continue'?'기존 계약으로 다음 시즌':'이번 시즌 시장 평가')+'</summary>';
   if(m.kind==='continue')html+='<p>'+escapeHtml(a.team)+' · 계약 종료 '+a.endYear+'년 · 다음 시즌 포함 '+(a.endYear-state.year)+'시즌 남음</p><p>계약 기간에는 새 FA 제안과 재협상을 열지 않습니다. 현재 소속·연봉·종료 연도를 유지합니다.</p>';
   else html+='<p>종합 '+e.score+' · 기량 '+e.ovr+' · 성과 '+e.performance+' · 출전 '+e.exposure+' · 나이 '+e.age+'세 · 부상 위험 보정 '+e.risk+'</p><p class="screen-intro">'+(m.kind==='legacy'?'이전 버전에서 이미 받은 구단·연봉·선택 순서를 보존한 제안입니다. 기간 정보가 없던 제안은 1년으로 이어집니다.':'프로 정규시즌 기록으로 평가합니다. 리그 경쟁 기준: 한국52·일본64·미국76. 기간과 FA는 실제 규정과 다른 가상 게임 규칙입니다.')+'</p>';
-  html+='</div>';
+  html+='</details>';
   m.offers.forEach((o,i)=>{
    const n=o.negotiation,checked=o.id===m.selectedId;
    html+='<article class="contract-card" data-contract-card="'+i+'"><label class="contract-option"><input type="radio" name="contractPick" value="'+i+'" '+(checked?'checked':'')+'><span><strong>'+escapeHtml(o.team)+' · '+V5_NAMES[o.region]+'</strong><span class="contract-pay">연봉 '+money(o.amount)+' · '+o.years+'년</span><small>'+roleNames[o.role]+' · '+(m.kind==='continue'?'잔여 기간 유지':'계약 총액 '+money(o.amount*o.years))+'</small></span></label>';

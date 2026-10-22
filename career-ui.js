@@ -2,7 +2,7 @@
 'use strict';
 (() => {
  const baseRender=render,baseSetup=setup,baseLayout=window.DiamondUI.layout;
- const titles={dashboard:'홈',news:'소식',league:'시즌',training:'선수',career:'기록'};
+ const titles={dashboard:'나의 야구 인생',news:'소식',league:'시즌',training:'선수',career:'기록'};
  const el=(tag,id,html='',cls='')=>{const n=document.createElement(tag);if(id)n.id=id;n.className=cls;n.innerHTML=html;return n;};
  const txt=v=>escapeHtml(String(v??''));
  let decorating=false;

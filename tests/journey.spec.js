@@ -29,7 +29,7 @@ test('mobile home has no horizontal overflow, bottom navigation is visible',asyn
 
 test('season details are collapsible and record filters isolate amateur history',async({page})=>{
  await create(page);await page.click('[data-tab=league]');await expect(page.locator('#leaguePane')).not.toBeVisible();await page.click('#journeyLeagueDetails summary');await expect(page.locator('#leaguePane')).toBeVisible();
- await page.click('[data-tab=career]');await expect(page.locator('#historyBody')).toBeVisible();await expect(page.locator('#diamondAmateurHistory')).not.toBeVisible();await page.click('[data-record-mode=amateur]');await expect(page.locator('#diamondAmateurHistory')).toBeVisible();await expect(page.locator('#historyBody')).not.toBeVisible();
+ await page.click('[data-tab=career]');await expect(page.locator('#seasonArchive')).toBeVisible();await page.click('#archiveComparison summary');await expect(page.locator('#historyBody')).toBeVisible();await expect(page.locator('#diamondAmateurHistory')).not.toBeVisible();await page.click('[data-record-mode=amateur]');await expect(page.locator('#diamondAmateurHistory')).toBeVisible();await expect(page.locator('#historyBody')).not.toBeVisible();
 });
 
 test('season preparation defaults to a single season action; detailed controls remain available',async({page})=>{

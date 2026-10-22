@@ -59,8 +59,8 @@
   $('journeyAction').textContent=state.retired?'새로운 커리어 준비':college()?(c.yearIndex>=3?'첫 프로 계약 선택':'대학 시즌 이어가기'):state.game===144?(u.reviewed?.[state.year]?'다음 시즌의 진로 결정':'이번 시즌 돌아보기'):'이번 시즌 시작하기';
   $('journeyTodo').innerHTML='<h3>'+(state.retired?'기록은 여기 남습니다':college()?(c.yearIndex>=3?'첫 유니폼을 고를 시간':'프로를 향한 준비'):state.game===144?'다음 시즌의 나는 어떤 선수일까요?':d.injury?'복귀를 위한 시간이 필요합니다':'다가올 기회를 준비하세요')+'</h3><p>'+(state.retired?'시즌별 기록과 수상, 이적의 발자취를 확인하세요.':college()?'대학 실전 성적이 스카우트 평가와 첫 입단 제안에 반영됩니다.':d.injury?'남은 재활 '+d.injury+'경기. 결장 기간에도 팀 일정은 진행됩니다.':state.game===144?'시즌 결산을 확인하고 육성 방향과 계약을 결정하세요.':'컨디션 '+Math.round(d.condition||0)+' · 피로 '+Math.round(d.fatigue||0)+' · '+(d.level||'1군'))+'</p><button type="button" id="todoLink">'+(state.retired?'커리어 기록 보기 →':'선수 상태 살펴보기 →')+'</button>';
   $('todoLink').onclick=()=>nav().show(state.retired?'career':'training');
-  const history=[...(state.v10?.amateur?.history||[]).filter(x=>x.stage==='high-school'||!college()),...state.career.map(y=>({year:y.year,label:y.team||'프로 시즌',achievement:(state.role==='batter'?y.stats.HR+'홈런 · '+y.stats.H+'안타':y.stats.PK+'탈삼진 · '+y.stats.W+'승')}))].sort((a,b)=>b.year-a.year).slice(0,4);
-  $('journeyTimeline').innerHTML='<div class="section-title-row"><h3>내가 걸어온 길</h3><span>CAREER JOURNEY</span></div>'+(history.length?history.map(x=>'<div class="timeline-row"><span class="year">'+x.year+'</span><i></i><div><strong>'+escapeHtml(x.label)+'</strong><small>'+escapeHtml(x.achievement||'')+'</small></div></div>').join(''):'<p class="screen-intro">오늘이 첫 번째 페이지입니다.</p>');
+  const history=[...(state.v10?.amateur?.history||[]).filter(x=>x.stage==='high-school'||!college()),...state.career.map((y,index)=>({archiveIndex:index,year:y.year,label:y.team||'프로 시즌',achievement:(state.role==='batter'?y.stats.HR+'홈런 · '+y.stats.H+'안타':y.stats.PK+'탈삼진 · '+y.stats.W+'승')}))].sort((a,b)=>b.year-a.year).slice(0,4);
+  $('journeyTimeline').innerHTML='<div class="section-title-row"><h3>내가 걸어온 길</h3><span>CAREER JOURNEY</span></div>'+(history.length?history.map(x=>'<div class="timeline-row"><span class="year">'+x.year+'</span><i></i><div><strong>'+escapeHtml(x.label)+'</strong><small>'+escapeHtml(x.achievement||'')+'</small>'+(Number.isInteger(x.archiveIndex)?'<button type="button" class="timeline-review" data-archive-index="'+x.archiveIndex+'">시즌 돌아보기 →</button>':'')+'</div></div>').join(''):'<p class="screen-intro">오늘이 첫 번째 페이지입니다.</p>');
  }
  function reviewHTML(){
   const u=data(),before=u.baselines?.[state.year],d=state.development||{},now=overall(),old=Array.isArray(before)?Math.round(before.reduce((a,b)=>a+b,0)/6):null;
@@ -125,7 +125,7 @@
  }
  function articles(){
   const list=state.career.slice(-3).reverse();
-  $('journeyArticles').innerHTML=list.length?list.map(s=>{const r=statline(s.stats,state.role);return '<article class="news-article"><span class="article-category">SEASON NOTE · '+s.year+'</span><h3>'+escapeHtml(state.name)+', '+(state.role==='batter'?s.stats.HR+'홈런과 '+s.stats.H+'안타':s.stats.PK+'탈삼진과 '+s.stats.W+'승')+'의 시즌을 남기다</h3><p>'+escapeHtml(s.team||(s.year===state.year?state.team:'소속 정보 미기록'))+' · '+s.stats.G+'경기 출전 · '+(state.role==='batter'?'타율 '+r.AVG:'평균자책점 '+r.ERA)+'</p></article>';}).join(''):'<p class="news-empty">아직 끝나지 않은 첫 시즌.<br>경기를 진행하면 이곳에 나의 이야기가 쌓입니다.</p>';
+  $('journeyArticles').innerHTML=list.length?list.map(s=>{const r=statline(s.stats,state.role);return '<article class="news-article"><span class="article-category">SEASON NOTE · '+s.year+'</span><h3>'+escapeHtml(state.name)+', '+(state.role==='batter'?s.stats.HR+'홈런과 '+s.stats.H+'안타':s.stats.PK+'탈삼진과 '+s.stats.W+'승')+'의 시즌을 남기다</h3><p>'+escapeHtml(s.team||(s.year===state.year?state.team:'소속 정보 미기록'))+' · '+s.stats.G+'경기 출전 · '+(state.role==='batter'?'타율 '+r.AVG:'평균자책점 '+r.ERA)+'</p><button type="button" class="secondary small" data-archive-index="'+state.career.indexOf(s)+'">시즌 돌아보기</button></article>';}).join(''):'<p class="news-empty">아직 끝나지 않은 첫 시즌.<br>경기를 진행하면 이곳에 나의 이야기가 쌓입니다.</p>';
   $('journeyChoices').innerHTML='<h2>내가 선택한 방향</h2>'+((Array.isArray(data().choices)?data().choices:[]).slice().reverse().map(x=>'<div class="history-choice">'+x.year+' · '+escapeHtml(x.title)+'<br><small>'+escapeHtml(x.effect)+'</small></div>').join('')||'<p class="screen-intro">시즌을 마치고 선택한 방향과 결과가 이곳에 남습니다.</p>');
  }
  function layout(){
@@ -170,6 +170,7 @@
    document.querySelector('.footer').textContent='가상의 야구 세계에서 써 내려가는 나의 커리어';
    home();season();articles();
    for(const page of document.querySelectorAll('.journey-screen'))page.hidden=page.dataset.screen!==nav().active;
+   window.DiamondArchive19?.layout();
   }finally{building=false;}
  }
  window.DiamondUI={layout,openSettings,openReview};

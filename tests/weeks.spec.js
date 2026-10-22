@@ -10,6 +10,7 @@ test('rest plan locks for seven team games, excludes pro stats and training; sur
  await page.click('[data-week-plan=rest]');await page.reload();await expect(page.locator('#createForm')).not.toHaveAttribute('inert','');await expect(page.locator('[data-week-plan=rest]')).toHaveAttribute('aria-pressed','true');
  await expect(page.locator('[data-week-plan=practice]')).toBeDisabled();await page.click('#weekBtn');const after=await read(page);
  expect(after.game).toBe(7);expect(after.current.G).toBe(0);expect(after.attributes).toEqual(before.attributes);expect(after.development.fatigue).toBe(35);expect(after.development.condition).toBe(61);expect(after.career14.plan).toBeNull();await expect(page.locator('#weekReport')).toContainText('프로 출장 0경기');
+ await tab(page,'training');await page.selectOption('#intensitySelect','rest');await tab(page,'league');await page.click('[data-week-plan=practice]');expect((await read(page)).career14.plan.intensity).toBe('normal');
 });
 test('selection creates different actual appearances; health affects plate appearances and pitching quality',async({page})=>{
  await start(page);

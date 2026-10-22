@@ -129,7 +129,7 @@
   if(!pro()||state.retired||state.game>=144||!modes.includes(mode))return;
   const c=ensure(),d=state.development;if(c.pending||(c.plan&&c.plan.end>state.game))return;
   if(mode==='rehab'&&!d.injury)return;
-  c.plan={mode,focus:d.focus,intensity:d.intensity,end:Math.min(144,state.game+7)};
+  c.plan={mode,focus:d.focus,intensity:d.intensity==='hard'?'hard':'normal',end:Math.min(144,state.game+7)};
   save();render();
  }
  function resolve(id,choice){
@@ -137,7 +137,7 @@
   if(!p||p.id!==id||!['train','rest'].includes(choice))return;
   // A fixed pending outcome is acknowledged once. No reroll or instant recovery.
   const mode=p.type==='injury'?'rehab':choice==='rest'?'rest':'practice';
-  c.plan={mode,focus:d.focus,intensity:mode==='practice'?d.intensity:'rest',end:Math.min(144,state.game+7)};
+  c.plan={mode,focus:d.focus,intensity:mode==='practice'?(d.intensity==='hard'?'hard':'normal'):'rest',end:Math.min(144,state.game+7)};
   c.history.push({...p,choice:mode});c.history=c.history.slice(-120);c.pending=null;
   v3Event(p.title+' → '+(mode==='rehab'?'재활 집중':mode==='rest'?'회복 우선':'훈련과 경쟁 재개'));save();render();
  }
@@ -149,7 +149,7 @@
   const root=node('careerWeek',$('screen-league'));$('seasonHeading').after(root);root.hidden=state.retired||state.game===144;
   const status=d.injury?'재활 '+d.injury+'경기':d.level==='2군'?'2군 훈련':label(c.role||(e.score>=62?'starter':'reserve'));
   const names={practice:state.role==='batter'?'타격 집중':'투구 집중',defense:state.role==='batter'?'수비 집중':'변화구 집중',rest:'휴식',rehab:'재활'};
-  const descriptions={practice:FOCI[state.role][d.focus][1]+' · 설정한 강도 적용',defense:(state.role==='batter'?'수비':'변화구')+' 훈련에 집중',rest:'출전·훈련 없이 몸 상태 회복',rehab:'부상 기간 회복 · 프로 출전 없음'};
+  const descriptions={practice:FOCI[state.role][d.focus][1]+' · '+(d.intensity==='hard'?'강훈련':'일반 훈련'),defense:(state.role==='batter'?'수비':'변화구')+' 훈련에 집중',rest:'출전·훈련 없이 몸 상태 회복',rehab:'부상 기간 회복 · 프로 출전 없음'};
   let html='<div class="section-title-row"><h3>다음 7경기의 준비</h3><span class="roster-chip">'+escapeHtml(status)+'</span></div>';
   if(c.pending){
    const event=c.pending;

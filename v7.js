@@ -39,7 +39,7 @@ window.__diamondSlotsEnabled=true;
   sync=sync.catch(()=>{}).then(()=>put(id,data,updated)).then(()=>{slotError=false;setMessage('커리어 슬롯 저장 완료');return updatePanel();}).catch(e=>{slotError=true;setMessage('슬롯 저장 오류: JSON 백업을 받아 주세요',true);});
  }
  save=saveSlot;
- function setMessage(message,err=false){const p=byId('diamondSlotsStatus');if(p){p.textContent=message;p.style.color=err?'#ffb4b4':'#aeeed0';}}
+ function setMessage(message,err=false){const p=byId('diamondSlotsStatus');if(p){p.textContent=message;p.dataset.problem=String(err);p.style.color=err?'#ffb4b4':'#aeeed0';}}
  function ensurePanel(){
   if(byId('diamondSlots'))return;
   const parent=(state?document.getElementById('diamondNav')||document.querySelector('#game .hero'):document.getElementById('create'))||document.getElementById('game');
@@ -49,10 +49,10 @@ window.__diamondSlotsEnabled=true;
   panel.innerHTML='<h2>💾 선수 커리어 저장 슬롯</h2><p class="muted">선수별 기록을 따로 보관하고 언제든지 전환할 수 있습니다.</p><div class="row"><select id="diamondSlotSelect" aria-label="저장 슬롯 선택" style="max-width:280px"></select><button type="button" class="secondary small" id="diamondSwitch">선수 불러오기</button><button type="button" class="secondary small" id="diamondNew">새 선수 슬롯</button><button type="button" class="danger small" id="diamondDelete">현재 슬롯 삭제</button></div><p id="diamondSlotsStatus" role="status" aria-live="polite" class="muted"></p><div id="diamondSlotCompare" class="tablewrap"></div>';
   parent.after(panel);
   byId('diamondSwitch').onclick=async()=>{await switchTo(byId('diamondSlotSelect').value);};
-  byId('diamondNew').onclick=async()=>{const ids=await allSlots();const free=Array.from({length:10},(_,i)=>'slot-'+(i+1)).find(x=>!ids.includes(x));if(!free){alert('최대 10명의 커리어를 보관할 수 있어요.');return;}await switchTo(free);};
+  byId('diamondNew').onclick=async()=>{if(state)saveSlot();await sync;if(slotError){alert('현재 슬롯 저장 실패. JSON 백업을 받아 주세요.');return;}const ids=await allSlots();const free=Array.from({length:10},(_,i)=>'slot-'+(i+1)).find(x=>!ids.includes(x));if(!free){alert('최대 10명의 커리어를 보관할 수 있어요.');return;}await switchTo(free);};
   byId('diamondDelete').onclick=async()=>{
    if(!confirm('현재 슬롯의 커리어를 영구적으로 삭제할까요? 먼저 JSON 백업을 권장합니다.'))return;
-   try{await sync;await remove(activeId);try{localStorage.removeItem(JOURNAL);}catch(e){}try{localStorage.setItem(MIGRATED,'1');}catch(e){}const ids=await allSlots();activeId=ids[0]||'slot-1';state=(await get(activeId))?.data||null;try{localStorage.setItem(META,activeId);localStorage.removeItem(LEGACY);}catch(e){}if(state)oldSave();render();await updatePanel();}catch(e){alert('삭제 실패: '+e.message);}
+   try{await sync;await remove(activeId);try{localStorage.removeItem(JOURNAL);}catch(e){}try{localStorage.setItem(MIGRATED,'1');}catch(e){}const ids=await allSlots();activeId=ids[0]||'slot-1';state=(await get(activeId))?.data||null;try{localStorage.setItem(META,activeId);localStorage.removeItem(LEGACY);}catch(e){}if(state)oldSave();render();window.dispatchEvent(new Event('diamond-slot-change'));await updatePanel();}catch(e){alert('삭제 실패: '+e.message);}
   };
  }
  async function allSlots(){
@@ -72,7 +72,7 @@ window.__diamondSlotsEnabled=true;
    try{localStorage.setItem(META,id);localStorage.removeItem(LEGACY);}catch(e){}
    if(state)oldSave();
    try{localStorage.removeItem(JOURNAL);}catch(e){}
-   render();
+   render();window.dispatchEvent(new Event('diamond-slot-change'));
    if(!state){window.scrollTo({top:0,behavior:'smooth'});}
    await updatePanel();
    setMessage(entry?'저장된 선수를 불러왔습니다.':'비어 있는 슬롯입니다. 새 선수를 생성하세요.');
@@ -85,7 +85,7 @@ window.__diamondSlotsEnabled=true;
   const candidates=[...new Set([...ids,activeId])].sort((a,b)=>Number(a.split('-')[1])-Number(b.split('-')[1]));
   select.innerHTML=candidates.map(id=>{const entry=infos.find(x=>x.id===id);return '<option value="'+id+'"'+(id===activeId?' selected':'')+'>'+id.replace('slot-','슬롯 ')+' · '+(entry?escapeHtml(entry.player.name)+' ('+entry.player.year+')':'빈 슬롯')+'</option>';}).join('');
   const compare=byId('diamondSlotCompare');
-  if(compare){compare.innerHTML=infos.length?'<h3>저장 선수 비교</h3><table><thead><tr><th>선수</th><th>유형</th><th>나이</th><th>소속</th><th>시즌</th></tr></thead><tbody>'+infos.map(x=>'<tr><td>'+escapeHtml(x.player.name)+'</td><td>'+(x.player.role==='batter'?'타자':'투수')+'</td><td>'+x.player.age+'</td><td>'+escapeHtml(x.player.team)+'</td><td>'+x.player.year+'</td></tr>').join('')+'</tbody></table>':'<p class="muted">아직 저장된 선수가 없습니다.</p>';}
+  if(compare){compare.innerHTML=infos.length?'<h3>저장 선수 비교</h3><table><thead><tr><th>선수</th><th>유형</th><th>나이</th><th>소속</th><th>시즌</th></tr></thead><tbody>'+infos.map(x=>'<tr><td>'+escapeHtml(x.player.name)+'</td><td>'+(x.player.role==='batter'?'타자':'투수')+'</td><td>'+x.player.age+'</td><td>'+escapeHtml(x.player.v12?.college&&!x.player.v12.college.completed?'대학 야구부':x.player.team)+'</td><td>'+x.player.year+'</td></tr>').join('')+'</tbody></table>':'<p class="muted">아직 저장된 선수가 없습니다.</p>';}
  }
  render=function(){oldRender();ensurePanel();const panel=byId('diamondSlots');const target=(state?document.getElementById('diamondNav')||document.querySelector('#game .hero'):document.getElementById('create'));if(panel&&target&&panel.previousElementSibling!==target)target.after(panel);void updatePanel().catch(console.error);};
  // Starting a fresh career should create a new slot, not erase existing careers.
@@ -95,7 +95,7 @@ window.__diamondSlotsEnabled=true;
    if(!free){alert('슬롯이 모두 사용 중입니다. JSON 백업 후 불필요한 슬롯을 삭제해 주세요.');return;}
    if(state){saveSlot();await sync;if(slotError)throw Error('현재 슬롯 저장 실패. JSON 백업을 받아 주세요.');}
    activeId=free;state=null;try{localStorage.removeItem(JOURNAL);}catch(e){}try{localStorage.setItem(META,activeId);localStorage.removeItem(LEGACY);}catch(e){}
-   render();window.scrollTo({top:0,behavior:'smooth'});
+   render();window.dispatchEvent(new Event('diamond-slot-change'));window.scrollTo({top:0,behavior:'smooth'});
   })().catch(e=>alert('새 슬롯 생성 실패: '+e.message));
  };
  setup=function(){

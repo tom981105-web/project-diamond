@@ -32,7 +32,8 @@
    c.game++;
    state.year=yr;state.age=18+c.yearIndex;
    if(c.game%4===0){
-    const idx=(c.yearIndex+c.game/4)%6;
+    const d=state.development;
+    const idx=d?((Number.isInteger(d.secondaryFocus)&&d.secondaryFocus>=0&&d.secondaryFocus<6&&c.results.length%8===0)?d.secondaryFocus:d.focus):(c.yearIndex+c.game/4)%6;
     state.attributes[idx]=Math.min(state.potential,state.attributes[idx]+1);
    }
   }

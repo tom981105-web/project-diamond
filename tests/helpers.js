@@ -21,4 +21,8 @@ async function advanceGames(page,count){
  }
  throw Error('Requested team games did not finish');
 }
-module.exports={finishSeason,advanceGames,openDetails};
+async function confirmAdvance(page){
+ await page.click('#nextBtn');
+ if(await page.locator('#careerAdvanceDialog').isVisible())await page.click('#confirmCareerAdvance');
+}
+module.exports={finishSeason,advanceGames,openDetails,confirmAdvance};

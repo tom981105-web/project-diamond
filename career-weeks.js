@@ -155,7 +155,7 @@
   let html='<div class="section-title-row"><h3>시즌의 준비</h3><span class="roster-chip">'+escapeHtml(status)+'</span></div>';
   if(c.pending){
    const event=c.pending;
-   html+='<div id="careerEvent" class="career-event" role="status"><p class="page-eyebrow">CAREER MOMENT · '+event.game+'경기</p><h3>'+escapeHtml(event.title)+'</h3><p>'+escapeHtml(event.detail)+'</p><p class="screen-intro">요청한 일정을 멈췄습니다. 남은 '+c.remaining+'팀 경기'+(c.remaining?'는 선택 후 이어갈 수 있습니다.':'입니다.')+'</p><div class="row">';
+   html+='<div id="careerEvent" class="career-event" role="status"><p class="page-eyebrow">CAREER MOMENT · '+event.game+'경기</p><h3>'+escapeHtml(event.title)+'</h3><p>'+escapeHtml(event.detail)+'</p><p class="screen-intro">요청한 일정을 멈췄습니다. 남은 '+c.remaining+'팀 경기'+(c.remaining?'는 선택 후 이어갈 수 있습니다.':'입니다.')+'</p><button type="button" class="secondary small" id="inspectCareerEvent">상황과 선택 자세히 보기</button><div class="row">';
    const options=event.type==='injury'?[['rest','재활 계획 확인']]:[['train','훈련과 경쟁 재개'],['rest','7경기 회복 우선']];
    html+=options.map(([id,title])=>'<button type="button" data-career-choice="'+id+'">'+title+'</button>').join('')+'</div></div>';
   }else{
@@ -183,7 +183,7 @@
   if($('intensitySelect')){$('intensitySelect').disabled=!!c.plan||!!c.pending;$('focusSelect').disabled=!!c.plan||!!c.pending;$('secondaryFocusSelect').disabled=!!c.plan||!!c.pending;}
   $('growthMessage').textContent='종합 '+overall()+' · 훈련과 실전 경험을 구분해 성장합니다.';
  }
- window.DiamondCareer14=Object.freeze({prepare,complete,pending:()=>!!ensure().pending,setRemaining:n=>{ensure().remaining=n;},score:roleScore,factor});
+ window.DiamondCareer14=Object.freeze({prepare,complete,pending:()=>!!ensure().pending,setRemaining:n=>{ensure().remaining=n;},score:roleScore,factor,resolve});
  play=function(n){
   if(!pro())return basePlay(n);
   if(state.retired||state.game>=144)return;

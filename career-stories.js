@@ -28,7 +28,7 @@
   if(state.game+7>144)return '7팀 경기 훈련을 확정할 일정이 부족합니다.';
   if(state.career14?.pending||pending())return '기다리고 있는 선택을 먼저 마쳐 주세요.';
   if(state.development.injury>0||state.career14?.plan?.end>state.game)return '재활 또는 확정한 훈련 계획을 먼저 마쳐 주세요.';
-  const n=data();if(n?.year===state.year&&n.team===state.team){if(n.seen.includes('coach-path'))return '이번 시즌 육성 상담을 이미 진행했습니다.';if(n.offered>=3)return '이번 시즌의 세 가지 이야기를 모두 만났습니다.';}
+  const n=data();if(coachingReview(n?.threads?.coach))return '지난 상담의 성장 점검을 먼저 마쳐 주세요. 시즌 진행 중 이어집니다.';if(n?.year===state.year&&n.team===state.team){if(n.seen.includes('coach-path'))return '이번 시즌 육성 상담을 이미 진행했습니다.';if(n.offered>=3)return '이번 시즌의 세 가지 이야기를 모두 만났습니다.';}
   return '';
  }
  function consult(){

@@ -63,5 +63,10 @@
   x.balance-=product.price;state.attributes[product.index]=Math.min(99,state.potential,before+1);x.purchases[state.year]={...product};log(product.title,product.price.toLocaleString()+'만원 사용 · '+ATTR[state.role][product.index]+' +1','purchase');save();render();return true;
  }
  function onTransfer(from,to){if(from===to||!state.life20)return;const x=ensure(),before=x.cohesion;x.cohesion=Math.floor(before/2);log('새 팀에 적응하는 시간','팀 유대 '+before+' → '+x.cohesion+' · 장기 훈련과 보유 자금 유지','transfer');}
- window.DiamondLife=Object.freeze({episode,choose,projects,startProject,factor,afterGame,products,buy,onTransfer});
+ function applyStory(title,effects,choiceLabel,training){
+  const x=ensure(),d=state.development,labels={condition:'컨디션',fatigue:'피로',trust:'구단 신뢰',morale:'사기',cohesion:'팀 유대'},changes=[];
+  for(const [key,value] of Object.entries(effects)){if(!Object.hasOwn(labels,key)||!Number.isFinite(value))continue;const target=['morale','cohesion'].includes(key)?x:d,before=target[key];target[key]=clamp(before+value,key==='morale'?-20:0,['morale','cohesion'].includes(key)?20:100);if(target[key]!==before)changes.push(labels[key]+' '+Math.round(before)+' → '+Math.round(target[key]));}
+  const effect=changes.join(' · ')||'상한·하한으로 추가 변화 없음';log(title,(choiceLabel?choiceLabel+' · ':'')+effect+(training?' · 7팀 경기 일반 훈련 계획 확정':''),'story22');return effect;
+ }
+ window.DiamondLife=Object.freeze({episode,choose,projects,startProject,factor,afterGame,products,buy,onTransfer,applyStory});
 })();

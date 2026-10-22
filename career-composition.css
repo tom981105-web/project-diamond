@@ -102,3 +102,5 @@ body.career-ui{--muted:#75808f;--ink:#202833;line-height:1.55}
 .career-ui #journeyTodo{border-radius:20px 20px 0 0}
 .career-ui #seasonActions>#seasonBtn{background:#3478eb;color:#fff}
 .career-ui #seasonActions>#seasonBtn:hover{background:#2868d3}
+/* V2.2: story choices use the player's supplied portrait, with no borrowed scene art. */
+.career-ui #careerStory22{padding:20px}.career-ui #careerStory22 p{font-size:12px;color:#74849a}.career-ui #careerStory22>button{width:100%;margin-top:10px}.story-speaker{display:flex;gap:16px;align-items:center;padding:12px 0 18px}.story-speaker img{width:70px;height:86px;object-fit:contain;border-radius:14px;background:#f4f6f9}.story-speaker small{font-size:11px;color:#8491a3}.story-speaker h3{font-size:20px;margin:8px 0}.story-feedback{padding:14px;margin-top:16px;border-radius:12px;background:#f4f8ff}.story-feedback strong{font-size:12px}.story-feedback p{margin:6px 0 0;font-size:11px!important}.career-ui #skipStory22{width:100%}

@@ -34,7 +34,7 @@
  function schedule(delay){clearTimeout(timer);timer=setTimeout(tick,delay);}
  function tick(){
   const r=run;if(!valid(r)){stop();return;}
-  if(state.career14?.pending||state.game>=r.target){stop(true);return;}
+  if(state.career14?.pending||window.DiamondStories22?.blocks()||state.game>=r.target){stop(true);return;}
   const previous=state.game,checkpoint=JSON.parse(JSON.stringify(state)),count=r.fast?r.target-state.game:Math.min(7,r.target-state.game);
   // Close before the final chunk so the existing completed-season report owns focus.
   if(r.target===144&&state.game+count>=144)$('seasonProgressDialog').close();
@@ -44,7 +44,7 @@
   r.inTick=false;
   if(run!==r||state!==r.owner||state.year!==r.year){stop();return;}
   r.expected=state.game;remaining(r);save();
-  if(state.game<=previous||state.career14?.pending||state.game>=r.target){stop(true);return;}
+  if(state.game<=previous||state.career14?.pending||window.DiamondStories22?.blocks()||state.game>=r.target){stop(true);return;}
   const match=state.league?.last;
   if(match)r.moments.push({game:state.game,text:match.away+' '+match.awayRuns+' : '+match.homeRuns+' '+match.home});
   if(r.moments.length>3)r.moments.shift();
@@ -52,7 +52,7 @@
   schedule(r.fast?0:110);
  }
  function start(target=144){
-  if(run||!pro()||state.retired||state.game>=144||state.career14?.pending)return;
+  if(run||!pro()||state.retired||state.game>=144||state.career14?.pending||window.DiamondStories22?.blocks())return;
   shell();$('seasonRunNotice')?.remove();const end=Math.min(144,Math.floor(target));if(end<=state.game)return;
   run={owner:state,year:state.year,target:end,expected:state.game,inTick:false,fast:window.matchMedia('(prefers-reduced-motion: reduce)').matches,moments:[]};
   remaining(run);save();render();$('skipSeasonAnimation').disabled=false;$('skipSeasonAnimation').textContent='연출 건너뛰기';paint();$('seasonProgressDialog').showModal();schedule(run.fast?0:140);

@@ -125,6 +125,7 @@
   }
   if(c.plan&&state.game>=c.plan.end)c.plan=null;
   window.DiamondLife?.afterGame({resting:r.resting,injured:wasInjured});
+  window.DiamondStories22?.afterGame({resting:r.resting,injured:wasInjured});
   round=null;
  }
  function choosePlan(mode){
@@ -184,7 +185,7 @@
   if($('intensitySelect')){$('intensitySelect').disabled=!!c.plan||!!c.pending;$('focusSelect').disabled=!!c.plan||!!c.pending;$('secondaryFocusSelect').disabled=!!c.plan||!!c.pending;}
   $('growthMessage').textContent='종합 '+overall()+' · 훈련과 실전 경험을 구분해 성장합니다.';
  }
- window.DiamondCareer14=Object.freeze({prepare,complete,pending:()=>!!ensure().pending,setRemaining:n=>{ensure().remaining=n;},score:roleScore,factor,resolve});
+ window.DiamondCareer14=Object.freeze({prepare,complete,pending:()=>!!ensure().pending||!!window.DiamondStories22?.blocks(),setRemaining:n=>{ensure().remaining=n;},score:roleScore,factor,resolve});
  play=function(n){
   if(!pro())return basePlay(n);
   if(state.retired||state.game>=144)return;

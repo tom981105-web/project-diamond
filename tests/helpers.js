@@ -8,9 +8,10 @@ async function runSeason(page,selector='#seasonBtn'){
 async function finishSeason(page){
  await page.emulateMedia({reducedMotion:'reduce'});
  for(let step=0;step<100;step++){
-  const status=await page.evaluate(()=>({game:state.game,pending:!!state.career14?.pending}));
+  const status=await page.evaluate(()=>({game:state.game,pending:!!state.career14?.pending,story:!!window.DiamondStories22?.blocks()}));
   if(status.game>=144)return;
-  if(status.pending)await page.locator('[data-career-choice]').first().click();
+  if(status.story&&!status.pending)await page.evaluate(()=>DiamondStories22.resolve(DiamondStories22.pending().id,'skip'));
+  else if(status.pending)await page.locator('[data-career-choice]').first().click();
   else await runSeason(page);
  }
  throw Error('Season did not finish within 100 career decisions');
@@ -22,8 +23,9 @@ async function advanceGames(page,count){
  await openDetails(page);
  const target=Math.min(144,await page.evaluate(()=>state.game)+count);
  for(let step=0;step<100;step++){
-  const s=await page.evaluate(()=>({game:state.game,pending:!!state.career14?.pending}));
+  const s=await page.evaluate(()=>({game:state.game,pending:!!state.career14?.pending,story:!!window.DiamondStories22?.blocks()}));
   if(s.game>=target)return;
+  if(s.story&&!s.pending){return;}
   if(s.pending)await page.locator('[data-career-choice]').first().click();
   else await page.click(target-s.game>=7?'#weekBtn':'#oneBtn');
  }

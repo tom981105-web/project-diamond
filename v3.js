@@ -25,7 +25,7 @@ function v3Play(n){
   if(manager.pending()){manager.setRemaining(rounds-step-1);break;}
  }
  if(state.game===144){
-  state.career.push({year:state.year,age:state.age,stats:{...state.current},ovr:overall(),salary:d.salary,level:d.level,team:state.team,region:state.globalCareer?.region||'KR'});
+  state.career.push({year:state.year,age:state.age,stats:{...state.current},ovr:overall(),salary:d.salary,level:d.level,team:state.team,region:state.globalCareer?.region||'KR',review19:window.DiamondArchive19?.snapshot()});
   let ratings=state.role==='batter'?(state.current.HR*3+state.current.H*.45):(state.current.PK*.6+state.current.W*3+state.current.SV);
   d.offers=[{team:state.team,amount:Math.round(clamp(2700+ratings*55+overall()*18,2800,250000)/100)*100},{team:TEAMS.filter(t=>t!==state.team)[integer(0,8)],amount:Math.round(clamp(3000+ratings*60+overall()*20,3000,250000)/100)*100}];
   v3Event(`${state.year} 시즌 종료! 계약 제안을 선택하고 다음 시즌을 시작하세요.`);

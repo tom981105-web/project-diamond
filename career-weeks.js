@@ -69,7 +69,7 @@
    if(!chance(opportunity))reason='기용 경쟁';
   }
   round={plan,injured:d.injury>0,resting,unavailable:!!reason};
-  state._unavailable=!!reason;state._unavailableReason=reason;state._performanceFactor=factor();
+  state._unavailable=!!reason;state._unavailableReason=reason;state._performanceFactor=factor()*(window.DiamondLife?.factor()||1);
  }
  function complete(before){
   const c=ensure(),d=state.development,r=round;if(!r)return;
@@ -124,6 +124,7 @@
    }
   }
   if(c.plan&&state.game>=c.plan.end)c.plan=null;
+  window.DiamondLife?.afterGame({resting:r.resting,injured:wasInjured});
   round=null;
  }
  function choosePlan(mode){

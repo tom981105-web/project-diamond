@@ -38,7 +38,7 @@
       const tag=document.createElement('span');tag.textContent=p.tag;
       const desc=document.createElement('small');desc.textContent=p.desc;
       const stat=document.createElement('small');stat.textContent='초기 능력치 '+p.stats.join(' · ');
-      button.append(title,tag,desc,stat);
+      button.append(title,tag,desc,stat);if(choice[role]===p.id){const bars=document.createElement('div');bars.className='prospect-bars';bars.innerHTML=ATTR[role].map((label,i)=>'<div><span>'+label+'</span><i><b style="width:'+p.stats[i]+'%"></b></i><strong>'+p.stats[i]+'</strong></div>').join('');button.append(bars);}
       button.onclick=()=>{choice[role]=p.id;paint();};
       root.append(button);
     }

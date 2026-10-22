@@ -31,6 +31,6 @@ async function advanceGames(page,count){
 }
 async function confirmAdvance(page){
  await page.click('#nextBtn');
- if(await page.locator('#careerAdvanceDialog').isVisible())await page.click('#confirmCareerAdvance');
+ if(await page.locator('#careerAdvanceDialog').isVisible()){if(await page.locator('#signatureName').isVisible())await page.locator('#signatureName').fill(await page.evaluate(()=>state.name));await page.click('#confirmCareerAdvance');}
 }
 module.exports={finishSeason,advanceGames,openDetails,confirmAdvance,runSeason};

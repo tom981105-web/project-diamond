@@ -1,3 +1,7 @@
+# PROJECT DIAMOND V2.4
+
+코치의 두 과제 제안→실제 훈련→후속 성장 점검, 시즌 중 반응, 생성 확인 카드와 항목별 결산을 연결했습니다. [구현·일정·저장 규칙](docs/CAREER-CHAPTERS-V2.4.md)을 확인하세요.
+
 # PROJECT DIAMOND V2.3
 
 실제 성적 중심의 시즌 화면, 장면과 대화가 있는 사건, 구단 관계·만남 기록, 간결한 계약 제안을 연결했습니다. [변경 내용과 저장 보호](docs/CAREER-PRESENTATION-V2.3.md)를 확인하세요.

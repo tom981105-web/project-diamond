@@ -182,7 +182,7 @@
   $('wizardCount').textContent=(wizardStep+1)+' / 4';$('wizardTitle').textContent=['나의 유니폼','선수의 첫 페이지','어떤 선수로 자랄까요?','집중할 성장 방향'][wizardStep];
   $('wizardNext').hidden=wizardStep===3;$('createForm').querySelector('button[type=submit]').hidden=wizardStep!==3;
   $('wizardBack').textContent=wizardStep===0?'처음으로':'이전';
-  if(wizardStep===3){const role=$('role').value;$('journeyFocus').innerHTML=ATTR[role].map((x,i)=>'<option value="'+i+'">'+x+'</option>').join('');$('journeyFocusSecond').innerHTML='<option value="-1">한 가지에 집중</option>'+ATTR[role].map((x,i)=>'<option value="'+i+'">'+x+'</option>').join('');$('wizardSummary').textContent=$('playerName').value+' · '+$('position').value+' · '+$('hand').value+' · '+(document.querySelector('[name=amateurPath]:checked')?.value==='college'?'대학 야구에서 시작':'프로 신인으로 시작');}
+  if(wizardStep===3){const role=$('role').value,first=$('journeyFocus'),second=$('journeyFocusSecond'),keep=first.dataset.role===role,previous=first.value,previousSecond=second.value;first.innerHTML=ATTR[role].map((x,i)=>'<option value="'+i+'">'+x+'</option>').join('');second.innerHTML='<option value="-1">한 가지에 집중</option>'+ATTR[role].map((x,i)=>'<option value="'+i+'">'+x+'</option>').join('');if(keep){first.value=previous;second.value=previousSecond;}first.dataset.role=role;$('wizardSummary').textContent=$('playerName').value+' · '+$('position').value+' · '+$('hand').value+' · '+(document.querySelector('[name=amateurPath]:checked')?.value==='college'?'대학 야구에서 시작':'프로 신인으로 시작');}
  }
  function wizard(){
   const form=$('createForm');if($('wizardProgress'))return;

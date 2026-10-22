@@ -1,5 +1,5 @@
 const {test,expect}=require('@playwright/test');
-const {finishSeason,openDetails,confirmAdvance}=require('./helpers');
+const {finishSeason,openDetails,confirmAdvance,runSeason}=require('./helpers');
 async function read(page){return page.evaluate(()=>JSON.parse(JSON.stringify(state)));}
 async function tab(page,id){await page.click(`[data-tab=${id}]`);}
 async function start(page,role='batter'){
@@ -33,10 +33,10 @@ test('selection creates different actual appearances; health affects plate appea
  });expect(hitting).toEqual(['1B','OUT']);
 });
 test('demotion pauses batch; training restores call-up with zero major-league appearances',async({page})=>{
- await start(page);await page.evaluate(()=>{state.development.trust=10;state.development.intensity='normal';save();render();});await page.click('#seasonBtn');let s=await read(page);
+ await start(page);await page.evaluate(()=>{state.development.trust=10;state.development.intensity='normal';save();render();});await runSeason(page);let s=await read(page);
  expect(s.game).toBe(7);expect(s.development.level).toBe('2군');expect(s.career14.pending.type).toBe('demotion');expect(s.career14.remaining).toBe(137);
  const id=s.career14.pending.id;await page.reload();await expect(page.locator('#careerEvent')).toContainText('2군');expect((await read(page)).career14.pending.id).toBe(id);await expect(page.locator('#seasonBtn')).toBeDisabled();
- await page.click('[data-career-choice=train]');const g=(await read(page)).current.G;await page.click('#continueCareer');s=await read(page);
+ await page.click('[data-career-choice=train]');const g=(await read(page)).current.G;await runSeason(page,'#continueCareer');s=await read(page);
  expect(s.career14.pending.type).toBe('promotion');expect(s.development.level).toBe('1군');expect(s.current.G).toBe(g);expect(s.attributes.reduce((a,b)=>a+b)).toBeGreaterThan(240);expect(s.development.trust).toBeGreaterThanOrEqual(48);
  await page.click('[data-career-choice=train]');await finishSeason(page);s=await read(page);expect(s.game).toBe(144);expect(s.career).toHaveLength(1);expect(s.career14.history.filter(x=>x.id===id)).toHaveLength(1);
 });
@@ -44,7 +44,7 @@ test('injury interrupts once, rehab preserves counts, return waits for choice af
  await start(page);await page.evaluate(()=>{state.development.fatigue=99;state.development.intensity='hard';const random=Math.random;Math.random=()=>0;try{play(144);}finally{Math.random=random;}});
  let s=await read(page);expect(s.game).toBe(1);expect(s.career14.pending.type).toBe('injury');const injured=s.development.injury;const g=s.current.G;const before=s.attributes;
  await page.click('[data-career-choice=rest]');await page.reload();await expect(page.locator('[data-week-plan=rehab]')).toHaveAttribute('aria-pressed','true');
- await page.click('#continueCareer');s=await read(page);expect(s.game).toBe(1+injured);expect(s.development.injury).toBe(0);expect(s.current.G).toBe(g);expect(s.attributes).toEqual(before);expect(s.career14.pending.type).toBe('return');
+ await runSeason(page,'#continueCareer');s=await read(page);expect(s.game).toBe(1+injured);expect(s.development.injury).toBe(0);expect(s.current.G).toBe(g);expect(s.attributes).toEqual(before);expect(s.career14.pending.type).toBe('return');
  const fixed=s.career14.pending.id;await page.reload();await expect(page.locator('#careerEvent')).toContainText('재활을 마쳤습니다');
  expect((await read(page)).career14.pending.id).toBe(fixed);
  await page.click('[data-career-choice=rest]');await openDetails(page);await page.click('#weekBtn');s=await read(page);expect(s.current.G).toBe(g);expect(s.career14.history.filter(x=>x.id===fixed)).toHaveLength(1);

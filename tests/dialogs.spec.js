@@ -1,5 +1,5 @@
 const {test,expect}=require('@playwright/test');
-const {finishSeason}=require('./helpers');
+const {finishSeason,runSeason}=require('./helpers');
 async function read(page){return page.evaluate(()=>JSON.parse(JSON.stringify(state)));}
 async function start(page){
  await page.goto('./');await expect(page.locator('#createForm')).not.toHaveAttribute('inert','');await page.click('#startJourney');for(let i=0;i<3;i++)await page.click('#wizardNext');await page.click('button[type=submit]');await page.click('[data-tab=league]');
@@ -29,7 +29,7 @@ test('pending injury inspection and postponement preserve outcome, counts and re
  const before=await read(page);expect(before.career14.pending.type).toBe('injury');await page.click('#inspectCareerEvent');await expect(page.locator('#careerMomentDialog')).toContainText(before.career14.remaining+'팀 경기');await expect(page.locator('[data-moment-choice=train]')).toHaveCount(0);await page.click('#postponeCareerMoment');
  let after=await read(page);expect(after.current).toEqual(before.current);expect(after.career14.pending).toEqual(before.career14.pending);expect(after.career14.plan).toEqual(before.career14.plan);expect(after.career14.remaining).toBe(before.career14.remaining);await expect(page.locator('#seasonBtn')).toBeDisabled();
  await page.reload();await page.click('#inspectCareerEvent');await page.click('[data-moment-choice=rest]');after=await read(page);expect(after.game).toBe(before.game);expect(after.current).toEqual(before.current);expect(after.career14.pending).toBeNull();expect(after.career14.plan.mode).toBe('rehab');expect(after.career14.history.filter(x=>x.id===before.career14.pending.id)).toHaveLength(1);
- await page.click('#continueCareer');after=await read(page);expect(after.game).toBe(before.game+before.development.injury);expect(after.current.G).toBe(before.current.G);expect(after.career14.pending.type).toBe('return');
+ await runSeason(page,'#continueCareer');after=await read(page);expect(after.game).toBe(before.game+before.development.injury);expect(after.current.G).toBe(before.current.G);expect(after.career14.pending.type).toBe('return');
 });
 
 test('modal closes when an imported player replaces its owner; stale confirmation cannot carry over',async({page})=>{

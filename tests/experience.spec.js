@@ -40,3 +40,7 @@ for(const width of [390,800,1366])test(`integrated dialogs, records and creation
 test('pitcher replay identifies actual pitching rather than a batting appearance',async({page})=>{
  await start(page,'pitcher');await stable(page);await page.click('[data-tab=league]');await advanceGames(page,1);const before=await read(page),plays=before.league.last.frames.flatMap(f=>f.plays);expect(plays.filter(p=>p.user)).toHaveLength(0);expect(plays.filter(p=>p.pitchUser&&p.kind==='SO')).toHaveLength(before.current.PK);expect(plays.some(p=>p.pitchUser)).toBe(true);await page.click('#openMatchReplay');await page.click('#replayFinish');await page.press('#matchReplayDialog','Escape');expect(await read(page)).toEqual(before);
 });
+
+test('changing clubs adapts team bonds while preserving wallet and long-term project',async({page})=>{
+ await start(page);await stable(page);await page.click('[data-tab=league]');await page.click('#openLifeMoment');await page.click('[data-life-choice=team]');await page.click('[data-tab=training]');await page.click('[data-project=adapt]');await offseason(page);await page.check('[name=contractPick][value="1"]');const before=await read(page);await confirmAdvance(page);const after=await read(page);expect(after.team).not.toBe(before.team);expect(after.life20.cohesion).toBe(Math.floor(before.life20.cohesion/2));expect(after.life20.balance).toBe(before.life20.balance);expect(after.life20.project).toEqual(before.life20.project);expect(after.life20.history.at(-1).kind).toBe('transfer');
+});

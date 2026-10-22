@@ -12,7 +12,7 @@
   x.balance=Math.max(0,x.balance);x.morale=clamp(x.morale,-20,20);x.cohesion=clamp(x.cohesion,0,20);
   return x;
  }
- function log(title,effect,kind='life'){const x=ensure();x.history.push({year:state.year,game:state.game,title,effect,kind});x.history=x.history.slice(-160);}
+ function log(title,effect,kind='life'){const x=ensure();x.history.push({year:state.year,game:state.game,title,effect,kind});x.history=x.history.slice(-400);}
  function episode(){
   if(!pro()||state.retired)return null;
   if(state.development?.injury)return {id:'care',title:'복귀를 준비하는 하루',detail:'트레이너와 남은 회복 기간의 생활 계획을 정합니다.',options:[['rest','충분히 쉬고 회복에 집중한다','컨디션 +8 · 피로 −12'],['team','동료와 함께 재활 계획을 나눈다','사기 +6 · 팀 유대 +4 · 신뢰 +3 · 피로 +4']]};
@@ -62,5 +62,6 @@
   const x=ensure(),before=state.attributes[product.index];if(x.purchases[state.year]||x.balance<product.price||before>=Math.min(99,state.potential))return false;
   x.balance-=product.price;state.attributes[product.index]=Math.min(99,state.potential,before+1);x.purchases[state.year]={...product};log(product.title,product.price.toLocaleString()+'만원 사용 · '+ATTR[state.role][product.index]+' +1','purchase');save();render();return true;
  }
- window.DiamondLife=Object.freeze({episode,choose,projects,startProject,factor,afterGame,products,buy});
+ function onTransfer(from,to){if(from===to||!state.life20)return;const x=ensure(),before=x.cohesion;x.cohesion=Math.floor(before/2);log('새 팀에 적응하는 시간','팀 유대 '+before+' → '+x.cohesion+' · 장기 훈련과 보유 자금 유지','transfer');}
+ window.DiamondLife=Object.freeze({episode,choose,projects,startProject,factor,afterGame,products,buy,onTransfer});
 })();

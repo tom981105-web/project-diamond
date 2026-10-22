@@ -127,6 +127,7 @@
   if(!c.history.some(x=>x.year===year))c.history.push({year,id:offer.id,type:m.kind==='continue'?'continue':'sign',fromTeam,team:a.team,region:a.region,annualSalary:a.annualSalary,endYear:a.endYear,role:a.role,negotiation:offer.negotiation?JSON.parse(JSON.stringify(offer.negotiation)):null});
   if(fromRegion!==a.region)state.globalCareer.moves.push({year,fromRegion,toRegion:a.region,fromTeam,toTeam:a.team});
   const last=state.career.at(-1);if(last?.year===year){last.team=fromTeam;last.region=fromRegion;}
+  window.DiamondLife?.onTransfer(fromTeam,a.team);
   state.league=null;ensureLeague();save();render();
  }
  function selectionAdjustment(){

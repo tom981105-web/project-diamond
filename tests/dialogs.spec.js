@@ -20,7 +20,7 @@ test('final confirmation can be cancelled; only explicit confirmation signs exac
  await page.click('#nextBtn');await expect(page.locator('#careerAdvanceDialog')).toContainText(o.team);await expect(page.locator('#careerAdvanceDialog')).toContainText('오래 뛸 몸 만들기');expect((await read(page)).year).toBe(2026);
  await page.click('#cancelCareerAdvance');expect((await read(page)).contract15.history).toEqual(before.contract15.history);expect((await read(page)).ui13.choices).toEqual(before.ui13.choices);
  await page.click('#nextBtn');await page.reload();expect((await read(page)).year).toBe(2026);await expect(page.locator('#careerAdvanceDialog')).not.toBeVisible();
- await page.click('#nextBtn');await page.click('#confirmCareerAdvance');const after=await read(page);expect(after.year).toBe(2027);expect(after.team).toBe(o.team);expect(after.development.salary).toBe(o.amount);expect(after.contract15.active.endYear).toBe(2026+o.years);expect(after.contract15.history).toHaveLength(1);expect(after.ui13.choices).toHaveLength(1);
+ await page.click('#nextBtn');{if(await page.locator('#signatureName').isVisible())await page.locator('#signatureName').fill(await page.evaluate(()=>state.name));await page.click('#confirmCareerAdvance');}const after=await read(page);expect(after.year).toBe(2027);expect(after.team).toBe(o.team);expect(after.development.salary).toBe(o.amount);expect(after.contract15.active.endYear).toBe(2026+o.years);expect(after.contract15.history).toHaveLength(1);expect(after.ui13.choices).toHaveLength(1);
  await page.reload();expect((await read(page)).contract15.history).toHaveLength(1);expect((await read(page)).ui13.choices).toHaveLength(1);
 });
 

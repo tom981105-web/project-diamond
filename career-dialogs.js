@@ -56,10 +56,23 @@
    const retiring=state.age>=40,o=selected();
    body.innerHTML=retiring?'<p class="decision-club">마지막 시즌을 기록으로 남깁니다.</p><p>완료한 '+state.career.length+'시즌의 기록을 보관하고 선수 생활을 마무리합니다.</p>':terms(o)+'<p class="decision-note">육성 방향: '+escapeHtml(({compete:state.role==='batter'?'주전 자리를 향해':'등판 기회를 향해',refine:state.role==='batter'?'타격의 빈틈 메우기':'제구의 완성도를 높이기',recover:state.role==='batter'?'오래 뛸 몸 만들기':'건강한 팔로 새 출발'})[state.ui13.drafts[state.year]])+'</p><p class="decision-note">선택한 육성 방향도 다음 시즌에 한 번 적용됩니다. 확정하면 '+(state.year+1)+'년으로 넘어갑니다.</p>';
    actions.innerHTML='<button type="button" class="secondary" id="cancelCareerAdvance">돌아가서 검토</button><button type="button" id="confirmCareerAdvance">'+(retiring?'은퇴 확정':'이 조건으로 다음 시즌 시작')+'</button>';
+   if(!retiring){
+    const signature=document.createElement('section');signature.className='signature-panel';
+    signature.innerHTML='<h3>나의 계약에 서명하기</h3><p class="decision-note">손으로 사인을 그리거나 선수 이름을 입력해 주세요. 게임 속 계약 확인입니다.</p><canvas id="careerSignature" width="640" height="150" aria-label="사인 그리기 영역"></canvas><label for="signatureName">이름으로 서명</label><input id="signatureName" maxlength="20" autocomplete="off" placeholder="'+escapeHtml(state.name)+'"><button type="button" id="clearSignature" class="secondary small">다시 서명</button>';
+    body.append(signature);const canvas=$('careerSignature'),ctx=canvas.getContext('2d');ctx.strokeStyle='#263342';ctx.lineWidth=3;ctx.lineCap='round';let drawing=false,points=0;
+    const ready=()=>{$('confirmCareerAdvance').disabled=!c.signed;};
+    canvas.onpointerdown=e=>{drawing=true;points=0;canvas.setPointerCapture(e.pointerId);const box=canvas.getBoundingClientRect();ctx.beginPath();ctx.moveTo((e.clientX-box.left)*canvas.width/box.width,(e.clientY-box.top)*canvas.height/box.height);};
+    canvas.onpointermove=e=>{if(!drawing)return;const box=canvas.getBoundingClientRect();ctx.lineTo((e.clientX-box.left)*canvas.width/box.width,(e.clientY-box.top)*canvas.height/box.height);ctx.stroke();if(++points>=3){c.signed='drawn';ready();}};
+    canvas.onpointerup=canvas.onpointercancel=()=>{drawing=false;};
+    $('signatureName').oninput=e=>{c.signed=e.target.value.trim()===state.name?'typed':null;ready();};
+    $('clearSignature').onclick=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);$('signatureName').value='';c.signed=null;ready();};ready();
+   }
    $('cancelCareerAdvance').onclick=close;
    $('confirmCareerAdvance').onclick=()=>{
     if(state!==c.owner||state.year!==c.year||state.game!==144||fingerprint()!==c.key){close();return;}
-    $('confirmCareerAdvance').disabled=true;close();nextSeason();
+    if(!retiring&&!c.signed)return;
+    const signature=c.signed,year=state.year;$('confirmCareerAdvance').disabled=true;close();nextSeason();
+    if(!retiring&&state===c.owner&&state.year===year+1){const entry=state.contract15?.history.find(x=>x.year===year);if(entry){entry.signature={name:state.name,method:signature};save();render();}}
    };
   }
  }

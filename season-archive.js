@@ -13,7 +13,7 @@
  let context=null;
  function snapshot(){
   const d=state.development,u=state.ui13||{};
-  return {version:1,role:state.role,position:state.position,attributes:[...state.attributes],baseline:attrs(u.baselines?.[state.year])?.slice()||null,baselineGame:Number.isInteger(u.baselineGames?.[state.year])?u.baselineGames[state.year]:null,focuses:[...new Set([d.focus,d.secondaryFocus].filter(x=>Number.isInteger(x)&&x>=0&&x<6))],condition:d.condition,fatigue:d.fatigue,growth:list(state.career14?.growth).filter(x=>x.year===state.year).map(x=>({...x})),moments:list(state.career14?.history).filter(x=>x.year===state.year).map(x=>({...x}))};
+  return {match20:state.league?.last?JSON.parse(JSON.stringify(state.league.last)):null,version:1,role:state.role,position:state.position,attributes:[...state.attributes],baseline:attrs(u.baselines?.[state.year])?.slice()||null,baselineGame:Number.isInteger(u.baselineGames?.[state.year])?u.baselineGames[state.year]:null,focuses:[...new Set([d.focus,d.secondaryFocus].filter(x=>Number.isInteger(x)&&x>=0&&x<6))],condition:d.condition,fatigue:d.fatigue,growth:list(state.career14?.growth).filter(x=>x.year===state.year).map(x=>({...x})),moments:list(state.career14?.history).filter(x=>x.year===state.year).map(x=>({...x}))};
  }
  function entries(){return list(state?.career).map((record,index)=>({record,index})).sort((a,b)=>b.record.year-a.record.year||b.index-a.index);}
  function details(record){const d=record.review19;return d?.version===1&&['batter','pitcher'].includes(d.role)&&attrs(d.attributes)?d:null;}
@@ -67,7 +67,7 @@
   if(choice)html+='<p class="decision-note">다음 시즌 육성: '+text(choice.title)+' · '+text(effect(choice.effect))+'</p>';
   if(contract)html+='<p class="decision-note">다음 시즌 계약: '+text(contract.team)+' · 연봉 '+text(Number(contract.annualSalary).toLocaleString())+'만원 · '+number(contract.endYear)+'년 종료</p>';
   html+='<p class="review-footnote">완료한 프로 정규시즌 기록입니다. 열람은 경기·계약·육성 방향을 확정하지 않습니다.</p>';
-  $('archiveContent').innerHTML=html;
+  $('archiveContent').innerHTML=html;window.DiamondExperience?.archive(record,$('archiveContent'));
   const records=entries(),position=records.findIndex(x=>x.index===c.index);$('archiveJump').innerHTML=records.map(x=>'<option value="'+x.index+'" '+(x.index===c.index?'selected':'')+'>'+text(x.record.year)+' · '+text(club(x.record))+'</option>').join('');$('archiveOlder').disabled=position===records.length-1;$('archiveNewer').disabled=position===0;
  }
  function layout(){

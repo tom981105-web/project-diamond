@@ -1,3 +1,7 @@
+# PROJECT DIAMOND V2.6
+
+대화의 선수·선택지와 선택 후 실제 결과를 연결하고, 기록된 효과를 다시 읽는 화면을 추가했습니다. [동작과 저장 보호](docs/CONVERSATION-FEEDBACK-V2.6.md)를 확인하세요.
+
 # PROJECT DIAMOND V2.5
 
 홈의 현재 시즌 진행도, 기존 캐릭터를 활용한 시즌 화면, 실제 성과를 보여 주는 시즌 진행 연출을 정리했습니다. [변경 내용과 저장 보호](docs/SEASON-STAGE-V2.5.md)를 확인하세요.

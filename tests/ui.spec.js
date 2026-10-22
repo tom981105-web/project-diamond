@@ -31,7 +31,7 @@ test('college profile and home shortcuts retain amateur separation',async({page}
 
 test('supplied first scene preserves its full aspect ratio and missing stages keep their fallback',async({page})=>{
  await page.setViewportSize({width:390,height:844});await page.goto('./');const scene=page.locator('#landingJourney img');await expect(scene).toBeVisible();await expect.poll(()=>scene.evaluate(e=>e.complete&&e.naturalWidth>0)).toBe(true);const box=await page.locator('.journey-placeholder').boundingBox();expect(box.width/box.height).toBeCloseTo(16/9,1);expect(await scene.evaluate(e=>getComputedStyle(e).objectFit)).toBe('contain');
- await page.getByRole('button',{name:'프로 데뷔',exact:true}).click();await expect(page.locator('#landingJourney img')).toHaveCount(0);await expect(page.locator('.journey-ball')).toBeVisible();await page.getByRole('button',{name:'첫 유니폼',exact:true}).click();await expect(page.locator('#landingJourney img')).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ await page.evaluate(()=>{delete window.DiamondVisualAssets.milestones[1];});await page.getByRole('button',{name:'프로 데뷔',exact:true}).click();await expect(page.locator('#landingJourney img')).toHaveCount(0);await expect(page.locator('.journey-ball')).toBeVisible();await page.getByRole('button',{name:'첫 유니폼',exact:true}).click();await expect(page.locator('#landingJourney img')).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 test('supplied first avatar loads in choice, preview, home, player and reload without replacing saved choice',async({page})=>{
  await page.goto('./');await page.click('#startJourney');const selected=page.locator('[data-avatar="0"] img');await expect(selected).toBeVisible();await expect.poll(()=>selected.evaluate(e=>e.complete&&e.naturalWidth>0)).toBe(true);await expect(page.locator('#avatarPreview img')).toBeVisible();
@@ -40,4 +40,17 @@ test('supplied first avatar loads in choice, preview, home, player and reload wi
 
 test('starting creation from below the scene resets the scroll position',async({page})=>{
  await page.setViewportSize({width:390,height:600});await page.goto('./');await page.locator('#startJourney').scrollIntoViewIfNeeded();expect(await page.evaluate(()=>scrollY)).toBeGreaterThan(0);await page.click('#startJourney');await expect.poll(()=>page.evaluate(()=>scrollY)).toBe(0);await expect(page.locator('#wizardTitle')).toBeInViewport();
+});
+
+for(const width of [390,1366])test(`all eleven artworks load and the avatar chooser fits ${width}px`,async({page})=>{
+ await page.setViewportSize({width,height:844});await page.goto('./');
+ for(const title of ['첫 유니폼','프로 데뷔','첫 안타','우승 도전','나의 기록']){await page.getByRole('button',{name:title,exact:true}).click();const image=page.locator('#landingJourney img');await expect.poll(()=>image.evaluate(e=>e.complete&&e.naturalWidth>0)).toBe(true);expect(await image.evaluate(e=>getComputedStyle(e).objectFit)).toBe('contain');}
+ await page.click('#startJourney');await expect(page.locator('.avatar-choice img')).toHaveCount(6);
+ for(let i=0;i<6;i++){await page.click(`[data-avatar="${i}"]`);const preview=page.locator('#avatarPreview img');await expect.poll(()=>preview.evaluate(e=>e.complete&&e.naturalWidth>0)).toBe(true);await expect(preview).toHaveAttribute('src',`./assets/portraits/avatar-0${i+1}.webp`);await expect(page.locator(`[data-avatar="${i}"]`)).toHaveAttribute('aria-pressed','true');}
+ const grid=await page.locator('.avatar-grid').boundingBox();expect(grid.height).toBeLessThan(width===390?270:155);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+test('avatar keyboard selection, cached art and sixth selection survive creation and reload',async({page})=>{
+ await page.setViewportSize({width:390,height:844});await page.goto('./');await page.click('#startJourney');await page.locator('[data-avatar="0"]').focus();await page.keyboard.press('ArrowDown');await expect(page.locator('[data-avatar="3"]')).toHaveAttribute('aria-pressed','true');await page.keyboard.press('End');await expect(page.locator('[data-avatar="5"]')).toBeFocused();await expect(page.locator('[data-avatar="5"]')).toHaveAttribute('aria-pressed','true');
+ const sameImage=await page.locator('[data-avatar="5"] img').evaluate(e=>{e.dataset.retained='true';return e.getAttribute('src');});await page.click('[data-avatar="5"]');await expect(page.locator('[data-avatar="5"] img')).toHaveAttribute('data-retained','true');
+ for(let i=0;i<3;i++)await page.click('#wizardNext');await page.click('button[type=submit]');const before=await read(page);expect(before.ui13.avatar).toBe(5);await expect(page.locator('#playerPortrait img')).toHaveAttribute('src',sameImage);await page.click('[data-tab=training]');await expect(page.locator('#playerIdentity img')).toHaveAttribute('src',sameImage);await page.reload();await expect(page.locator('#playerIdentity img')).toHaveAttribute('src',sameImage);expect(await read(page)).toEqual(before);
 });

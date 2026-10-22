@@ -14,15 +14,17 @@
  function reactions(record){
   const s=record.stats||empty(),bat=state.role==='batter',season=state.legacyV4?.seasons?.[record.year],club=record.team||season?.club||'소속 미기록';
   const headline=club+'의 '+state.name+', '+record.year+'년 '+(bat?s.H+'안타·'+s.HR+'홈런':s.PK+'탈삼진·'+s.W+'승')+'을 남기다';
+  const story=list(state.narrative22?.history).filter(h=>h&&h.year===record.year&&h.status==='chosen').at(-1);
   const first=s.G<30?'출전 기회가 많지는 않았네. 다음 시즌에는 더 자주 보고 싶다.':bat?(s.HR>=20?'타석에 들어서면 한 방을 기대하게 된다.':'한 타석씩 기록을 쌓는 모습이 좋다.'):'등판마다 쌓은 이닝과 결과를 함께 봐야지.';
   const second=season?.postseason?.champion===club?'동료들과 함께 만든 우승이라 더 기억에 남을 것 같다.':'다음 시즌에는 팀 성적도 함께 올라갔으면 좋겠다.';
-  return '<div class="press-story"><small>다이아몬드 스포츠 · 가상 기사</small><strong>'+text(headline)+'</strong><p>'+text(fact(record))+'</p></div>'+[["오늘도직관",first],["구장옆자리",second],["기록노트",'종합 능력 '+(record.ovr??'미기록')+'. 성적과 성장 기록을 같이 보자.']].map(([name,comment],i)=>'<div class="fan-comment"><span class="fan-avatar">'+text(name[0])+'</span><div><strong>'+name+'</strong><p>'+text(comment)+'</p><small>게임 속 팬 · '+text(record.year)+' 시즌</small></div><span class="fan-count">♡ '+Math.max(1,Math.round((s.G||0)/3+i*7))+'</span></div>').join('')+'<p class="fiction-note">기록을 바탕으로 구성한 게임 속 가상 기사와 반응입니다.</p>';
+  return '<div class="press-story"><small>다이아몬드 스포츠 · 가상 기사</small><strong>'+text(headline)+'</strong><p>'+text(fact(record))+'</p></div>'+[["오늘도직관",first],["구장옆자리",second],["기록노트",story?'이번 시즌 ‘'+story.title+'’에서 ‘'+story.label+'’을 선택했었지.':'종합 능력 '+(record.ovr??'미기록')+'. 성적과 성장 기록을 같이 보자.']].map(([name,comment],i)=>'<div class="fan-comment"><span class="fan-avatar">'+text(name[0])+'</span><div><strong>'+name+'</strong><p>'+text(comment)+'</p><small>게임 속 팬 · '+text(record.year)+' 시즌</small></div><span class="fan-count">♡ '+Math.max(1,Math.round((s.G||0)/3+i*7))+'</span></div>').join('')+'<p class="fiction-note">기록을 바탕으로 구성한 게임 속 가상 기사와 반응입니다.</p>';
  }
  function moments(record){
-  const items=list(state.life20?.history).filter(x=>x.year===record.year&&x.kind!=='salary');
+  const items=list(state.life20?.history).filter(x=>x.year===record.year&&x.kind!=='salary'&&x.kind!=='story22');
   const decisions=list(state.career14?.history).filter(x=>x.year===record.year);
   const project=items.map(x=>'<div class="season-moment"><strong>'+text(x.title)+'</strong><p>'+text(x.effect)+'</p></div>').join('');
-  return project+decisions.map(x=>'<div class="season-moment"><strong>'+text(x.title)+'</strong><p>'+text(x.detail)+' · '+text(({rehab:'재활 집중',rest:'회복 우선',practice:'훈련 재개'})[x.choice]||x.choice)+'</p></div>').join('');
+  const stories=list(state.narrative22?.history).filter(x=>x&&x.year===record.year).map(x=>'<div class="season-moment"><strong>'+text(x.title)+' · '+text(x.label)+'</strong><p>'+text(x.effect)+'</p></div>').join('');
+  return project+stories+decisions.map(x=>'<div class="season-moment"><strong>'+text(x.title)+'</strong><p>'+text(x.detail)+' · '+text(({rehab:'재활 집중',rest:'회복 우선',practice:'훈련 재개'})[x.choice]||x.choice)+'</p></div>').join('');
  }
  function report(record,target){
   if(!record||!target)return;let section=target.querySelector('.experience-report');if(!section){section=document.createElement('section');section.className='experience-report';target.append(section);}const season=state.legacyV4?.seasons?.[record.year],champion=season?.postseason?.champion===(record.team||season?.club);

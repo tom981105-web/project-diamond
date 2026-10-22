@@ -12,6 +12,7 @@
   if(school()){const c=state.v12.college;return c.yearIndex>=3?{id:'entry',title:'첫 프로 유니폼을 고를 시간',detail:'대학 36경기의 성적과 스카우트 평가가 입단 제안에 반영됐습니다.',action:'프로 입단 제안 확인'}:{id:'college',title:'프로를 향한 대학 시절',detail:'대학 '+Math.min(3,c.yearIndex+1)+'학년 · '+c.results.length+' / 36경기. 실전과 훈련으로 다음 기회를 준비합니다.',action:'대학 시즌 준비하기'};}
   const p=state.career14?.pending,u=state.ui13||{};
   if(p)return {id:'moment',title:p.title,detail:p.detail,action:'상황과 선택 확인'};
+  const story=window.DiamondStories22?.pending();if(window.DiamondStories22?.blocks())return {id:'story',title:story.title,detail:story.detail,action:'이야기와 선택 확인'};
   if(state.game===144){
    if(!u.reviewed?.[state.year])return {id:'review',title:'이번 시즌을 돌아볼 시간',detail:state.year+'년의 출전 기록과 성장, 팀 성과를 확인한 뒤 다음 진로를 결정합니다.',action:'시즌 결산 확인'};
    if(state.age>=40)return {id:'retirement',title:'나의 야구 인생을 마무리하며',detail:'마지막 시즌의 기록을 보관하고 은퇴를 확정할 수 있습니다.',action:'은퇴 전 최종 확인'};
@@ -23,6 +24,7 @@
  function go(target){
   const p=phase();window.DiamondNavigation.show(target==='player'?'training':target==='records'?'career':'league');
   if(target==='player'||target==='records')return;
+  if(p.id==='story'){window.DiamondStories22.open();return;}
   if(p.id==='moment'){$('inspectCareerEvent')?.click();return;}
   if(p.id==='review'){window.DiamondUI.openReview();return;}
   const id=p.id==='entry'?'diamondCollege':['direction','contract','retirement'].includes(p.id)?'seasonDecision':'seasonStory';
@@ -39,7 +41,7 @@
   let detail=p.detail;
   if(p.id==='contract'){const m=state.contract15?.markets?.[state.year];detail=(m?.kind==='continue'?'기존 계약 유지':(m?.offers?.length||0)+'개 제안')+' · 연봉·기간·기용 역할 검토';}
   if(p.id==='season'&&c?.remaining)detail='멈춰 둔 일정 '+c.remaining+'팀 경기 · '+state.game+' / 144팀 경기';
-  $('journeyTodo').innerHTML='<h3>확인할 일</h3>'+row('homeCareerTask',p.id==='season'?'이번 시즌의 준비':p.title,detail,p.id==='retired'?'records':'season',['moment','review','direction','contract','entry','retirement'].includes(p.id))+row('homeTrainingTask',state.retired?'선수 프로필':'집중 육성 중',focus()||'선수 능력치와 훈련 과제 확인','player');
+  $('journeyTodo').innerHTML='<h3>확인할 일</h3>'+row('homeCareerTask',p.id==='season'?'이번 시즌의 준비':p.title,detail,p.id==='retired'?'records':'season',['story','moment','review','direction','contract','entry','retirement'].includes(p.id))+row('homeTrainingTask',state.retired?'선수 프로필':'집중 육성 중',focus()||'선수 능력치와 훈련 과제 확인','player');
   for(const button of $('journeyTodo').querySelectorAll('[data-flow-target]'))button.onclick=()=>go(button.dataset.flowTarget);
   $('journeyAction').textContent=p.action;$('journeyAction').onclick=()=>go(p.id==='retired'?'records':'season');
   // Detailed status stays on the player and season pages; the home is an entry point.
@@ -72,7 +74,7 @@
    const metrics=school()?[]:(state.role==='batter'?[['출장',state.current.G],['타율',state.current.AB?statline(state.current,state.role).AVG:'—'],['홈런',state.current.HR]]:[['등판',state.current.G],['평균자책점',state.current.IPouts?statline(state.current,state.role).ERA:'—'],['탈삼진',state.current.PK]]);
    story.insertAdjacentHTML('beforeend','<div class="chapter-progress" aria-label="시즌 진행"><span>'+count+' / '+limit+'팀 경기</span><strong>'+Math.round(count/limit*100)+'%</strong><progress max="'+limit+'" value="'+count+'" aria-label="시즌 완료 경기"></progress></div>'+(metrics.length?'<div class="chapter-stats">'+metrics.map(([label,value])=>'<div><small>'+label+'</small><strong>'+text(value)+'</strong></div>').join('')+'</div>':''));
   }
-  if(p.id==='moment'||p.id==='review'){
+  if(p.id==='story'||p.id==='moment'||p.id==='review'){
    const button=document.createElement('button');button.id='seasonStoryAction';button.type='button';button.textContent=p.action;button.onclick=()=>go('season');story.append(button);
   }
   if(p.id==='retirement'){story.querySelectorAll('.flow-steps li')[1].textContent='시즌 기록 보관';}

@@ -7,4 +7,14 @@ async function finishSeason(page){
  }
  throw Error('Season did not finish within 100 career decisions');
 }
-module.exports={finishSeason};
+async function advanceGames(page,count){
+ const target=Math.min(144,await page.evaluate(()=>state.game)+count);
+ for(let step=0;step<100;step++){
+  const s=await page.evaluate(()=>({game:state.game,pending:!!state.career14?.pending}));
+  if(s.game>=target)return;
+  if(s.pending)await page.locator('[data-career-choice]').first().click();
+  else await page.click(target-s.game>=7?'#weekBtn':'#oneBtn');
+ }
+ throw Error('Requested team games did not finish');
+}
+module.exports={finishSeason,advanceGames};

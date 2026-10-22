@@ -85,7 +85,7 @@
   const labels=freshLabels.length?freshLabels:[...document.querySelectorAll('#contractOptions input[name=contractPick]')].map(x=>x.closest('label'));
   const decision=$('seasonDecision');if($('nextBtn'))$('seasonActions').append($('nextBtn'));decision.innerHTML='';
   if(decision.hidden)return;
-  decision.innerHTML='<button type="button" class="secondary" id="reopenReview" style="width:100%;margin-bottom:25px">시즌 결산 다시 보기</button><p class="page-eyebrow">NEXT CHAPTER</p><h2>다음 시즌의 방향</h2><p class="screen-intro">계약을 확정할 때 적용됩니다. 선택한 방향은 저장되어 다시 이어갈 수 있습니다.</p><div class="choice-list" id="directionOptions"></div><h3>도착한 계약 제안</h3><p class="screen-intro">가상 리그의 시즌 단위 계약입니다. 연봉과 소속이 다음 시즌에 반영됩니다.</p><div id="contractOptions"></div>';
+  decision.innerHTML='<button type="button" class="secondary" id="reopenReview" style="width:100%;margin-bottom:25px">시즌 결산 다시 보기</button><p class="page-eyebrow">NEXT CHAPTER</p><h2>다음 시즌의 방향</h2><p class="screen-intro">계약을 확정할 때 적용됩니다. 선택한 방향은 저장되어 다시 이어갈 수 있습니다.</p><div class="choice-list" id="directionOptions"></div><h3>도착한 계약 제안</h3><p class="screen-intro">연봉·기간·예상 역할을 비교하세요. 구단의 예상 역할은 출전 보장이 아니며 실제 경쟁 평가에 반영됩니다.</p><div id="contractOptions"></div>';
   $('reopenReview').onclick=openReview;
   for(const [id,title,effect] of choiceOptions()){
    const b=element('button',null,'<span class="choice-dot"></span><span><strong>'+title+'</strong><small>'+effect+'</small></span>','direction-choice'+(u.drafts?.[state.year]===id?' selected':''));b.type='button';b.dataset.direction=id;b.setAttribute('aria-pressed',String(u.drafts?.[state.year]===id));b.onclick=()=>{writable().drafts[state.year]=id;save();render();};$('directionOptions').append(b);
@@ -97,6 +97,7 @@
    label.querySelector('small')?.remove();label.append(element('small',null,'1년 · 가상 리그 · 다음 시즌 소속 및 연봉 확정'));$('contractOptions').append(label);
   }
   for(const h of document.querySelectorAll('#developmentPane h3'))if(h.textContent.includes('계약'))h.remove();
+  if(window.DiamondContracts)window.DiamondContracts.marketView($('contractOptions'));
   decision.append($('nextBtn'));
  }
  function articles(){

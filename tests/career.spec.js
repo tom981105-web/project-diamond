@@ -47,12 +47,12 @@ for(const role of ['batter','pitcher'])test(`college 36 games → signing → pr
   await page.click('#oneBtn');expect((await snapshot(page)).game).toBe(1);
   // Seven team games in total, then a complete season.
   for(let i=0;i<6;i++)await page.click('#oneBtn');expect((await snapshot(page)).game).toBe(7);
-  await finishSeason(page);await finishReview(page);s=await snapshot(page);expect(s.game).toBe(144);expect(s.career).toHaveLength(1);expect(s.league.round).toBe(144);expect(s.development.offers).toHaveLength(4);expect(s.development.offers[1].region).toBe('JP');
+  await finishSeason(page);await finishReview(page);s=await snapshot(page);expect(s.game).toBe(144);expect(s.career).toHaveLength(1);expect(s.league.round).toBe(144);expect(s.development.offers.length).toBeGreaterThanOrEqual(3);expect(s.contract15.markets[s.year].evaluation.stats).toEqual(s.current);
   for(const club of s.league.standings)expect(club.W+club.L+club.T).toBe(144);
   expect(s.career[0].stats).toEqual(s.current);expect(s.legacyV4.seasons[2029]).toBeTruthy();expect(s.attributes.reduce((a,b)=>a+b)).toBeGreaterThan(249);
   await saved(page);await page.reload();await ready(page);expect((await snapshot(page)).current).toEqual(s.current);
   await tab(page,'league');await page.check('[name=contractPick][value="1"]');const target=(await snapshot(page)).development.offers[1];
-  await tab(page,'league');await page.click('#nextBtn');s=await snapshot(page);expect(s.year).toBe(2030);expect(s.game).toBe(0);expect(s.team).toBe(target.team);expect(s.globalCareer.region).toBe('JP');expect(s.globalCareer.moves).toHaveLength(1);expect(s.development.salary).toBe(target.amount);expect(s.career).toHaveLength(1);
+  await tab(page,'league');await page.click('#nextBtn');s=await snapshot(page);expect(s.year).toBe(2030);expect(s.game).toBe(0);expect(s.team).toBe(target.team);expect(s.globalCareer.region).toBe(target.region);expect(s.globalCareer.moves).toHaveLength(target.region==='KR'?0:1);expect(s.contract15.active.endYear).toBe(2030+target.years-1);expect(s.development.salary).toBe(target.amount);expect(s.career).toHaveLength(1);
   await tab(page,'career');const proBackup=await exportJSON(page);await importJSON(page,proBackup);expect((await snapshot(page)).career).toEqual(proBackup.career);
 });
 for(const role of ['batter','pitcher'])test(`high-school ${role}, training, injury and slots`,async({page})=>{

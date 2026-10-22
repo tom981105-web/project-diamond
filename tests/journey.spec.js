@@ -1,4 +1,4 @@
-const {finishSeason}=require('./helpers');
+const {finishSeason,advanceGames}=require('./helpers');
 const {test,expect}=require('@playwright/test');
 async function create(page,role='batter',secondary=false){
  await page.goto('./');await expect(page.locator('#createForm')).not.toHaveAttribute('inert','');await page.click('#startJourney');await page.click('[data-avatar="2"]');await page.click('#wizardNext');await page.fill('#playerName','커리어검증');await page.selectOption('#role',role);await page.click('#wizardNext');await page.click('#wizardNext');if(secondary)await page.selectOption('#journeyFocusSecond','1');await page.click('button[type=submit]');
@@ -9,7 +9,7 @@ test('four-step creation, player-first home, five destinations and settings',asy
  await create(page,'batter',true);expect((await state(page)).ui13.avatar).toBe(2);
  await expect(page.locator('#diamondNav button')).toHaveCount(5);await expect(page.locator('#diamondSlots')).not.toBeVisible();await expect(page.locator('#journeyAction')).toBeVisible();
  await page.click('#journeyAction');await expect(page.locator('#seasonBtn')).toBeVisible();await expect(page.locator('#nameLabel')).not.toBeVisible();
- await page.click('#weekBtn');await page.click('#weekBtn');await page.click('#weekBtn');for(let i=0;i<3;i++)await page.click('#oneBtn');
+ await advanceGames(page,24);
  const s=await state(page);expect(s.attributes[0]).toBe(58);expect(s.attributes[1]).toBe(35);expect(s.development.secondaryFocus).toBe(1);
  await page.click('[data-tab=news]');await expect(page.locator('#events')).toBeVisible();
  await page.click('#journeySettingsButton');await expect(page.locator('#diamondSlots')).toBeVisible();await expect(page.locator('#exportBtn')).toBeVisible();await page.click('#closeSettings');

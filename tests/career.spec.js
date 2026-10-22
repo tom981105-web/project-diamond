@@ -1,4 +1,4 @@
-const {finishSeason}=require('./helpers');
+const {finishSeason,openDetails}=require('./helpers');
 const {test,expect}=require('@playwright/test');
 const KEY='project-diamond-save-v1';
 async function ready(page){await expect(page.locator('#createForm')).not.toHaveAttribute('inert','');}
@@ -13,9 +13,9 @@ async function create(page,name,role='batter',college=false,position){
 }
 async function settings(page){if(!await page.locator('#journeySettings').evaluate(x=>x.open))await page.click('#journeySettingsButton');}
 async function closeSettings(page){if(await page.locator('#journeySettings').evaluate(x=>x.open))await page.click('#closeSettings');}
-async function finishReview(page){await page.click('#confirmReview');await page.click('[data-direction=recover]');}
+async function finishReview(page){await page.click('#confirmReview');if((await snapshot(page)).age<40)await page.click('[data-direction=recover]');}
 async function newSlot(page){await settings(page);await page.click('#diamondNew');await expect(page.locator('#startJourney')).toBeVisible();}
-async function tab(page,id){await page.click(`[data-tab=${id}]`);}
+async function tab(page,id){await page.click(`[data-tab=${id}]`);if(id==='league')await openDetails(page);}
 async function exportJSON(page,selector='#exportBtn'){
   if(selector==='#exportBtn')await settings(page);
   const pending=page.waitForEvent('download');await page.click(selector);const file=await pending;

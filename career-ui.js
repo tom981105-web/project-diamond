@@ -72,6 +72,6 @@
  }
  window.DiamondUI.layout=function(){baseLayout();decorate();};
  render=function(){baseRender();decorate();};setup=function(){baseSetup();decorate();};
- document.addEventListener('click',event=>{if(event.target.closest('.avatar-choice,#wizardNext,#wizardBack,#startJourney'))creation();});
+ document.addEventListener('click',event=>{if(event.target.closest('.avatar-choice,#wizardNext,#wizardBack,#startJourney'))creation();if(event.target.closest('#startJourney,#wizardBack'))window.scrollTo({top:0,behavior:'instant'});});
  window.addEventListener('diamond-slot-change',decorate);
 })();

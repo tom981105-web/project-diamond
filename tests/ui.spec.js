@@ -37,3 +37,7 @@ test('supplied first avatar loads in choice, preview, home, player and reload wi
  await page.goto('./');await page.click('#startJourney');const selected=page.locator('[data-avatar="0"] img');await expect(selected).toBeVisible();await expect.poll(()=>selected.evaluate(e=>e.complete&&e.naturalWidth>0)).toBe(true);await expect(page.locator('#avatarPreview img')).toBeVisible();
  for(let i=0;i<3;i++)await page.click('#wizardNext');await page.click('button[type=submit]');const before=await read(page);expect(before.ui13.avatar).toBe(0);await expect(page.locator('#playerPortrait img')).toBeVisible();await page.click('[data-tab=training]');await expect(page.locator('#playerIdentity img')).toBeVisible();await page.reload();await expect(page.locator('#playerIdentity img')).toBeVisible();expect(await read(page)).toEqual(before);
 });
+
+test('starting creation from below the scene resets the scroll position',async({page})=>{
+ await page.setViewportSize({width:390,height:600});await page.goto('./');await page.locator('#startJourney').scrollIntoViewIfNeeded();expect(await page.evaluate(()=>scrollY)).toBeGreaterThan(0);await page.click('#startJourney');await expect.poll(()=>page.evaluate(()=>scrollY)).toBe(0);await expect(page.locator('#wizardTitle')).toBeInViewport();
+});

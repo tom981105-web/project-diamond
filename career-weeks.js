@@ -151,16 +151,17 @@
   const status=d.injury?'재활 '+d.injury+'경기':d.level==='2군'?'2군 훈련':label(c.role||(e.score>=62?'starter':'reserve'));
   const names={practice:state.role==='batter'?'타격 집중':'투구 집중',defense:state.role==='batter'?'수비 집중':'변화구 집중',rest:'휴식',rehab:'재활'};
   const descriptions={practice:FOCI[state.role][d.focus][1]+' · '+(d.intensity==='hard'?'강훈련':'일반 훈련'),defense:(state.role==='batter'?'수비':'변화구')+' 훈련에 집중',rest:'출전·훈련 없이 몸 상태 회복',rehab:'부상 기간 회복 · 프로 출전 없음'};
-  let html='<div class="section-title-row"><h3>다음 7경기의 준비</h3><span class="roster-chip">'+escapeHtml(status)+'</span></div>';
+  const expanded=root.querySelector('#weeklyPlans')?.open||!!c.plan;
+  let html='<div class="section-title-row"><h3>시즌의 준비</h3><span class="roster-chip">'+escapeHtml(status)+'</span></div>';
   if(c.pending){
    const event=c.pending;
    html+='<div id="careerEvent" class="career-event" role="status"><p class="page-eyebrow">CAREER MOMENT · '+event.game+'경기</p><h3>'+escapeHtml(event.title)+'</h3><p>'+escapeHtml(event.detail)+'</p><p class="screen-intro">요청한 일정을 멈췄습니다. 남은 '+c.remaining+'팀 경기'+(c.remaining?'는 선택 후 이어갈 수 있습니다.':'입니다.')+'</p><div class="row">';
    const options=event.type==='injury'?[['rest','재활 계획 확인']]:[['train','훈련과 경쟁 재개'],['rest','7경기 회복 우선']];
    html+=options.map(([id,title])=>'<button type="button" data-career-choice="'+id+'">'+title+'</button>').join('')+'</div></div>';
   }else{
-   html+='<p class="screen-intro">'+(c.plan?'확정한 계획 · '+(c.plan.end-state.game)+'팀 경기 남음':'현재 기본 계획: '+names[p.mode]+' · 필요할 때 7경기 계획을 확정하세요.')+'</p><div class="week-plans">';
+   html+='<p class="screen-intro">집중 과제: '+escapeHtml(FOCI[state.role][d.focus][1])+' · 컨디션 '+Math.round(d.condition)+' · 피로 '+Math.round(d.fatigue)+'</p><details id="weeklyPlans" '+(expanded?'open':'')+'><summary>훈련·휴식 계획 자세히</summary><p class="screen-intro">'+(c.plan?'확정한 계획 · '+(c.plan.end-state.game)+'팀 경기 남음':'현재 기본 계획: '+names[p.mode]+' · 필요할 때 7경기 계획을 확정하세요.')+'</p><div class="week-plans">';
    for(const mode of modes){const disabled=!!c.plan||(mode==='rehab'&&!d.injury);html+='<button type="button" class="week-plan'+(c.plan?.mode===mode?' selected':'')+'" data-week-plan="'+mode+'" aria-pressed="'+(c.plan?.mode===mode)+'" '+(disabled?'disabled':'')+'><strong>'+names[mode]+'</strong><small>'+escapeHtml(descriptions[mode])+'</small></button>';}
-   html+='</div><p class="screen-intro">확정한 계획은 7팀 경기 동안 유지됩니다. 훈련 성과는 실제 훈련일을, 실전 성장은 실제 출장·투구 이닝을 계산합니다.</p>';
+   html+='</div><p class="screen-intro">확정한 계획은 7팀 경기 동안 유지됩니다. 훈련 성과는 실제 훈련일을, 실전 성장은 실제 출장·투구 이닝을 계산합니다.</p></details>';
    if(c.remaining>0)html+='<button type="button" id="continueCareer" class="main-action">남은 '+c.remaining+'경기 이어가기</button>';
   }
   const w=c.weeks.at(-1);
@@ -170,7 +171,7 @@
   root.querySelectorAll('[data-career-choice]').forEach(b=>b.onclick=()=>resolve(c.pending?.id,b.dataset.careerChoice));
   if($('continueCareer'))$('continueCareer').onclick=()=>{const n=c.remaining;c.remaining=0;play(n);};
   for(const id of ['seasonBtn','weekBtn','oneBtn'])if($(id))$(id).disabled=!!c.pending||state.retired||state.game>=144;
-  if(!root.hidden){$('seasonBtn').textContent='중요한 선택까지 시즌 진행';$('weekBtn').textContent='7경기 진행';}
+  if(!root.hidden){$('seasonBtn').textContent=state.year+' 시즌 보내기';$('weekBtn').textContent='7경기 진행';}
   const coach=node('coachPanel',$('screen-training'));$('attributes').closest('.panel').before(coach);coach.hidden=false;
   const rate=state.role==='batter'?'주전이면 약 82–98%, 경쟁 중이면 평가에 따라 28–68%의 경기 기용 기회':'기용 평가 후 선발은 5팀 경기 간격, 구원은 경기 상황별 기존 등판 판정';
   coach.innerHTML='<p class="page-eyebrow">COACH REPORT</p><h2>'+escapeHtml(status)+'</h2><p>'+escapeHtml(e.summary)+'</p><div class="report-rows"><div class="report-row"><span>현재 기용 평가</span><b>'+e.score+' / 100</b></div><div class="report-row"><span>기량 · 구단 신뢰</span><b>'+overall()+' · '+d.trust+'</b></div><div class="report-row"><span>컨디션 · 피로</span><b>'+Math.round(d.condition)+' · '+Math.round(d.fatigue)+'</b></div><div class="report-row"><span>경기 능력 적용</span><b>'+Math.round(factor()*100)+'%</b></div></div><p class="screen-intro">계약 역할·리그 적응 보정 '+e.contractAdjustment.toFixed(1)+'점 · 시즌 초 42팀 경기에 걸쳐 사라집니다.</p><p class="screen-intro">'+rate+'. 기용 평가는 7팀 경기마다 갱신합니다. 경쟁 우위 진입 62, 유지 54 이상. 2군은 신뢰 48·컨디션 45 이상에서 복귀합니다.</p><p class="coach-advice">'+(d.injury?'재활을 마치기 전에는 공식 경기에 출전할 수 없습니다.':d.level==='2군'?'2군 훈련으로 매주 신뢰를 회복하세요. 프로 누적 성적으로 복귀를 막지 않습니다.':d.fatigue>60||d.condition<45?'피로를 낮추고 컨디션을 회복하면 기용 평가와 경기 능력이 함께 개선됩니다.':e.form<0?'최근 부진이 평가에 반영되고 있습니다. 선택한 과제를 훈련하고 다음 기회를 준비하세요.':'기량과 신뢰를 쌓아 기용 평가 62를 목표로 하세요.')+'</p>';

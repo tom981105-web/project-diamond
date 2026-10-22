@@ -10,10 +10,10 @@ async function fixture(page,strength='high',role='batter'){
   state.role=role;state.position=role==='batter'?'포수':'선발투수';state.age=25;state.attributes.fill(strength==='high'?80:strength==='medium'?60:25);state.potential=95;
   const stats=strength==='low'?empty():role==='batter'?{...empty(),G:strength==='high'?130:90,PA:520,AB:450,H:strength==='high'?160:120,HR:strength==='high'?35:10,B2:30,B3:5,BB:65,RBI:80}:{...empty(),G:29,GS:29,IPouts:540,ER:45,PK:200,W:15};
   state.current=stats;state.game=144;state.career=[{year:state.year,age:state.age,stats:{...stats},ovr:overall(),salary:state.development.salary,team:state.team,region:v5Region()}];
-  state.contract15.markets={};state.globalCareer.offersReadyYear=null;state.ui13.contracts={};render();save();
+  state.contract15.markets={};state.globalCareer.offersReadyYear=null;state.ui13.contracts={};state.ui13.reviewed[state.year]=true;state.ui13.drafts[state.year]='recover';render();save();
  },{strength,role});
 }
-async function selectDirection(page){if(await page.locator('#journeyReview').evaluate(e=>e.open))await page.click('#confirmReview');await page.click('[data-direction=recover]');}
+async function selectDirection(page){if(await page.locator('#journeyReview').evaluate(e=>e.open))await page.click('#confirmReview');if(await page.locator('#changeDirection').isVisible())await page.click('#changeDirection');await page.click('[data-direction=recover]');}
 async function request(page,index,kind){await page.locator(`[data-contract-card="${index}"] [data-negotiate=${kind}]`).click();}
 
 test('actual batting/pitching exposure, age and injuries affect valuation; zero innings earn no ERA bonus',async({page})=>{

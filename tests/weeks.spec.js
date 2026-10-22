@@ -1,14 +1,14 @@
 const {test,expect}=require('@playwright/test');
-const {finishSeason}=require('./helpers');
+const {finishSeason,openDetails}=require('./helpers');
 async function read(page){return page.evaluate(()=>JSON.parse(JSON.stringify(state)));}
 async function tab(page,id){await page.click(`[data-tab=${id}]`);}
 async function start(page,role='batter'){
- await page.goto('./');await expect(page.locator('#createForm')).not.toHaveAttribute('inert','');await page.click('#startJourney');await page.click('#wizardNext');await page.selectOption('#role',role);await page.click('#wizardNext');await page.click('#wizardNext');await page.click('button[type=submit]');await tab(page,'league');
+ await page.goto('./');await expect(page.locator('#createForm')).not.toHaveAttribute('inert','');await page.click('#startJourney');await page.click('#wizardNext');await page.selectOption('#role',role);await page.click('#wizardNext');await page.click('#wizardNext');await page.click('button[type=submit]');await tab(page,'league');await openDetails(page);
 }
 test('rest plan locks for seven team games, excludes pro stats and training; survives reload',async({page})=>{
  await start(page);await page.evaluate(()=>{state.development.fatigue=70;state.development.condition=40;render();});const before=await read(page);
  await page.click('[data-week-plan=rest]');await page.reload();await expect(page.locator('#createForm')).not.toHaveAttribute('inert','');await expect(page.locator('[data-week-plan=rest]')).toHaveAttribute('aria-pressed','true');
- await expect(page.locator('[data-week-plan=practice]')).toBeDisabled();await page.click('#weekBtn');const after=await read(page);
+ await expect(page.locator('[data-week-plan=practice]')).toBeDisabled();await openDetails(page);await page.click('#weekBtn');const after=await read(page);
  expect(after.game).toBe(7);expect(after.current.G).toBe(0);expect(after.attributes).toEqual(before.attributes);expect(after.development.fatigue).toBe(35);expect(after.development.condition).toBe(61);expect(after.career14.plan).toBeNull();await expect(page.locator('#weekReport')).toContainText('프로 출장 0경기');
  await tab(page,'training');await page.selectOption('#intensitySelect','rest');await tab(page,'league');await page.click('[data-week-plan=practice]');expect((await read(page)).career14.plan.intensity).toBe('normal');
 });
@@ -47,7 +47,7 @@ test('injury interrupts once, rehab preserves counts, return waits for choice af
  await page.click('#continueCareer');s=await read(page);expect(s.game).toBe(1+injured);expect(s.development.injury).toBe(0);expect(s.current.G).toBe(g);expect(s.attributes).toEqual(before);expect(s.career14.pending.type).toBe('return');
  const fixed=s.career14.pending.id;await page.reload();await expect(page.locator('#careerEvent')).toContainText('재활을 마쳤습니다');
  expect((await read(page)).career14.pending.id).toBe(fixed);
- await page.click('[data-career-choice=rest]');await page.click('#weekBtn');s=await read(page);expect(s.current.G).toBe(g);expect(s.career14.history.filter(x=>x.id===fixed)).toHaveLength(1);
+ await page.click('[data-career-choice=rest]');await openDetails(page);await page.click('#weekBtn');s=await read(page);expect(s.current.G).toBe(g);expect(s.career14.history.filter(x=>x.id===fixed)).toHaveLength(1);
 });
 test('training and experience growth use actual exposure, cap at potential, and ledger agrees',async({page})=>{
  await start(page);const result=await page.evaluate(()=>{

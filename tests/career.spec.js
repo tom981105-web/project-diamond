@@ -1,3 +1,4 @@
+const {finishSeason}=require('./helpers');
 const {test,expect}=require('@playwright/test');
 const KEY='project-diamond-save-v1';
 async function ready(page){await expect(page.locator('#createForm')).not.toHaveAttribute('inert','');}
@@ -46,7 +47,7 @@ for(const role of ['batter','pitcher'])test(`college 36 games → signing → pr
   await page.click('#oneBtn');expect((await snapshot(page)).game).toBe(1);
   // Seven team games in total, then a complete season.
   for(let i=0;i<6;i++)await page.click('#oneBtn');expect((await snapshot(page)).game).toBe(7);
-  await page.click('#seasonBtn');await finishReview(page);s=await snapshot(page);expect(s.game).toBe(144);expect(s.career).toHaveLength(1);expect(s.league.round).toBe(144);expect(s.development.offers).toHaveLength(4);expect(s.development.offers[1].region).toBe('JP');
+  await finishSeason(page);await finishReview(page);s=await snapshot(page);expect(s.game).toBe(144);expect(s.career).toHaveLength(1);expect(s.league.round).toBe(144);expect(s.development.offers).toHaveLength(4);expect(s.development.offers[1].region).toBe('JP');
   for(const club of s.league.standings)expect(club.W+club.L+club.T).toBe(144);
   expect(s.career[0].stats).toEqual(s.current);expect(s.legacyV4.seasons[2029]).toBeTruthy();expect(s.attributes.reduce((a,b)=>a+b)).toBeGreaterThan(249);
   await saved(page);await page.reload();await ready(page);expect((await snapshot(page)).current).toEqual(s.current);
@@ -94,7 +95,7 @@ test('long career reaches retirement without duplicate seasons',async({page})=>{
   let lastTeam;
   for(let i=0;i<23;i++){
     lastTeam=(await snapshot(page)).team;
-    await tab(page,'league');await page.click('#seasonBtn');await finishReview(page);await page.click('#nextBtn');
+    await tab(page,'league');await finishSeason(page);await finishReview(page);await page.click('#nextBtn');
     if((await snapshot(page)).retired)break;
   }
   const s=await snapshot(page);expect(s.retired).toBe(true);expect(s.team).toBe(lastTeam);expect(s.age).toBe(40);expect(s.career).toHaveLength(23);expect(new Set(s.career.map(x=>x.year)).size).toBe(23);

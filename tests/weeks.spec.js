@@ -1,5 +1,5 @@
 const {test,expect}=require('@playwright/test');
-const {finishSeason,openDetails}=require('./helpers');
+const {finishSeason,openDetails,confirmAdvance}=require('./helpers');
 async function read(page){return page.evaluate(()=>JSON.parse(JSON.stringify(state)));}
 async function tab(page,id){await page.click(`[data-tab=${id}]`);}
 async function start(page,role='batter'){
@@ -59,7 +59,7 @@ test('training and experience growth use actual exposure, cap at potential, and 
 test('old save adds no retroactive growth; optional state is isolated by player and season',async({page})=>{
  await start(page);await page.evaluate(()=>{delete state.career14;state.game=30;state.current.G=22;state.current.H=15;save();render();});const old=await read(page);
  expect(old.current.H).toBe(15);expect(old.career14.growth).toEqual([]);expect(old.career14.experience).toBe(0);
- await finishSeason(page);await page.click('#confirmReview');await page.click('[data-direction=recover]');await page.click('#nextBtn');let s=await read(page);expect(s.career14.year).toBe(s.year);expect(s.career14.recent).toEqual([]);expect(s.career14.pending).toBeNull();
+ await finishSeason(page);await page.click('#confirmReview');await page.click('[data-direction=recover]');await confirmAdvance(page);let s=await read(page);expect(s.career14.year).toBe(s.year);expect(s.career14.recent).toEqual([]);expect(s.career14.pending).toBeNull();
  await page.click('#journeySettingsButton');await page.click('#diamondNew');await page.click('#startJourney');for(let i=0;i<3;i++)await page.click('#wizardNext');await page.click('button[type=submit]');s=await read(page);expect(s.career14.history).toEqual([]);expect(s.career14.growth).toEqual([]);
 });
 test('fielding skill reaches opponent at-bats; weekly UI fits mobile with a pending injury',async({page})=>{

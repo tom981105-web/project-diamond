@@ -1,4 +1,4 @@
-const {finishSeason,openDetails}=require('./helpers');
+const {finishSeason,openDetails,confirmAdvance}=require('./helpers');
 const {test,expect}=require('@playwright/test');
 const KEY='project-diamond-save-v1';
 async function ready(page){await expect(page.locator('#createForm')).not.toHaveAttribute('inert','');}
@@ -52,7 +52,7 @@ for(const role of ['batter','pitcher'])test(`college 36 games → signing → pr
   expect(s.career[0].stats).toEqual(s.current);expect(s.legacyV4.seasons[2029]).toBeTruthy();expect(s.attributes.reduce((a,b)=>a+b)).toBeGreaterThan(249);
   await saved(page);await page.reload();await ready(page);expect((await snapshot(page)).current).toEqual(s.current);
   await tab(page,'league');await page.check('[name=contractPick][value="1"]');const target=(await snapshot(page)).development.offers[1];
-  await tab(page,'league');await page.click('#nextBtn');s=await snapshot(page);expect(s.year).toBe(2030);expect(s.game).toBe(0);expect(s.team).toBe(target.team);expect(s.globalCareer.region).toBe(target.region);expect(s.globalCareer.moves).toHaveLength(target.region==='KR'?0:1);expect(s.contract15.active.endYear).toBe(2030+target.years-1);expect(s.development.salary).toBe(target.amount);expect(s.career).toHaveLength(1);
+  await tab(page,'league');await confirmAdvance(page);s=await snapshot(page);expect(s.year).toBe(2030);expect(s.game).toBe(0);expect(s.team).toBe(target.team);expect(s.globalCareer.region).toBe(target.region);expect(s.globalCareer.moves).toHaveLength(target.region==='KR'?0:1);expect(s.contract15.active.endYear).toBe(2030+target.years-1);expect(s.development.salary).toBe(target.amount);expect(s.career).toHaveLength(1);
   await tab(page,'career');const proBackup=await exportJSON(page);await importJSON(page,proBackup);expect((await snapshot(page)).career).toEqual(proBackup.career);
 });
 for(const role of ['batter','pitcher'])test(`high-school ${role}, training, injury and slots`,async({page})=>{
@@ -95,7 +95,7 @@ test('long career reaches retirement without duplicate seasons',async({page})=>{
   let lastTeam;
   for(let i=0;i<23;i++){
     lastTeam=(await snapshot(page)).team;
-    await tab(page,'league');await finishSeason(page);await finishReview(page);await page.click('#nextBtn');
+    await tab(page,'league');await finishSeason(page);await finishReview(page);await confirmAdvance(page);
     if((await snapshot(page)).retired)break;
   }
   const s=await snapshot(page);expect(s.retired).toBe(true);expect(s.team).toBe(lastTeam);expect(s.age).toBe(40);expect(s.career).toHaveLength(23);expect(new Set(s.career.map(x=>x.year)).size).toBe(23);

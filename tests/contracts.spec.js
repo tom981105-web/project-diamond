@@ -1,5 +1,5 @@
 const {test,expect}=require('@playwright/test');
-const {finishSeason}=require('./helpers');
+const {finishSeason,confirmAdvance}=require('./helpers');
 async function read(page){return page.evaluate(()=>JSON.parse(JSON.stringify(state)));}
 async function start(page,role='batter'){
  await page.goto('./');await expect(page.locator('#createForm')).not.toHaveAttribute('inert','');await page.click('#startJourney');await page.click('#wizardNext');await page.selectOption('#role',role);await page.click('#wizardNext');await page.click('#wizardNext');await page.click('button[type=submit]');await page.click('[data-tab=league]');
@@ -14,7 +14,7 @@ async function fixture(page,strength='high',role='batter'){
  },{strength,role});
 }
 async function selectDirection(page){if(await page.locator('#journeyReview').evaluate(e=>e.open))await page.click('#confirmReview');if(await page.locator('#changeDirection').isVisible())await page.click('#changeDirection');await page.click('[data-direction=recover]');}
-async function request(page,index,kind){await page.locator(`[data-contract-card="${index}"] [data-negotiate=${kind}]`).click();}
+async function request(page,index,kind){const details=page.locator(`[data-contract-card="${index}"] details`);if(!await details.evaluate(e=>e.open))await details.locator('summary').click();await page.locator(`[data-contract-card="${index}"] [data-negotiate=${kind}]`).click();}
 
 test('actual batting/pitching exposure, age and injuries affect valuation; zero innings earn no ERA bonus',async({page})=>{
  await start(page);
@@ -30,13 +30,13 @@ test('salary accepted once; choice and revised terms persist, then sign a multiy
  await request(page,i,'salary');let s=await read(page),o=s.development.offers[i];expect(o.negotiation.status).toBe('accepted');expect(o.amount).toBeGreaterThan(m.offers[i].amount);expect(s.development.salary).toBe(original.development.salary);
  page.once('dialog',d=>d.accept());await page.setInputFiles('#importFile',{name:'negotiated.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(s))});expect((await read(page)).development.offers[i]).toEqual(o);
  await expect(page.locator(`[data-contract-card="${i}"] [data-negotiate]`)).toHaveCount(0);await page.check(`[name=contractPick][value="${i}"]`);await selectDirection(page);await page.reload();await expect(page.locator('#createForm')).not.toHaveAttribute('inert','');await expect(page.locator(`[name=contractPick][value="${i}"]`)).toBeChecked();
- expect((await read(page)).development.offers[i]).toEqual(o);await page.click('#nextBtn');s=await read(page);expect(s.year).toBe(2027);expect(s.development.salary).toBe(o.amount);expect(s.development.contractYears).toBe(o.years);expect(s.contract15.active.endYear).toBe(2027+o.years-1);expect(s.contract15.history).toHaveLength(1);
+ expect((await read(page)).development.offers[i]).toEqual(o);await confirmAdvance(page);s=await read(page);expect(s.year).toBe(2027);expect(s.development.salary).toBe(o.amount);expect(s.development.contractYears).toBe(o.years);expect(s.contract15.active.endYear).toBe(2027+o.years-1);expect(s.contract15.history).toHaveLength(1);
  await page.reload();await expect(page.locator('#createForm')).not.toHaveAttribute('inert','');expect((await read(page)).contract15.history).toHaveLength(1);await page.click('[data-tab=training]');await expect(page.locator('#contractSummary')).toContainText(o.years+'시즌 남음');
 });
 
 test('salary counter must be resolved before signing; declining preserves original offer, rejection does not reroll',async({page})=>{
  await start(page);await fixture(page,'medium');let s=await read(page);const i=s.development.offers.findIndex(o=>o.interest>=48&&o.interest<70&&o.ceiling>o.amount);expect(i).toBeGreaterThanOrEqual(0);const original=s.development.offers[i].amount;
- await request(page,i,'salary');await page.check(`[name=contractPick][value="${i}"]`);await selectDirection(page);page.once('dialog',d=>d.accept());await page.click('#nextBtn');expect((await read(page)).year).toBe(2026);
+ await request(page,i,'salary');await page.check(`[name=contractPick][value="${i}"]`);await selectDirection(page);page.once('dialog',d=>d.accept());await confirmAdvance(page);expect((await read(page)).year).toBe(2026);
  await page.reload();await expect(page.locator(`[data-contract-card="${i}"] [data-counter=decline]`)).toBeVisible();await page.locator(`[data-contract-card="${i}"] [data-counter=decline]`).click();s=await read(page);expect(s.development.offers[i].amount).toBe(original);expect(s.development.offers[i].negotiation.status).toBe('declined');
  await fixture(page,'low');await request(page,0,'salary');s=await read(page);expect(s.development.offers[0].negotiation.status).toBe('rejected');const fixed=s.development.offers[0];await page.reload();await expect(page.locator('#createForm')).not.toHaveAttribute('inert','');expect((await read(page)).development.offers[0]).toEqual(fixed);
 });
@@ -50,12 +50,12 @@ test('role counter changes both salary and expectation only after acceptance',as
 });
 
 test('remaining contract blocks fresh FA offers, advances once per year and expires correctly',async({page})=>{
- await start(page);await fixture(page);let s=await read(page);const i=s.development.offers.findIndex(o=>o.years>=3);expect(i).toBeGreaterThanOrEqual(0);const offer=s.development.offers[i];await page.check(`[name=contractPick][value="${i}"]`);await selectDirection(page);await page.click('#nextBtn');
+ await start(page);await fixture(page);let s=await read(page);const i=s.development.offers.findIndex(o=>o.years>=3);expect(i).toBeGreaterThanOrEqual(0);const offer=s.development.offers[i];await page.check(`[name=contractPick][value="${i}"]`);await selectDirection(page);await confirmAdvance(page);
  const end=(await read(page)).contract15.active.endYear;
  for(let y=2027;y<=end;y++){
   await page.click('[data-tab=league]');await finishSeason(page);await selectDirection(page);s=await read(page);const m=s.contract15.markets[y];
   if(y<end){expect(m.kind).toBe('continue');expect(s.development.offers).toHaveLength(1);expect(s.development.offers[0].team).toBe(offer.team);expect(s.development.offers[0].amount).toBe(offer.amount);await expect(page.locator('[data-negotiate]')).toHaveCount(0);
-   await page.click('#nextBtn');s=await read(page);expect(s.development.contractYears).toBe(end-y);expect(s.contract15.active.endYear).toBe(end);await page.reload();await expect(page.locator('#createForm')).not.toHaveAttribute('inert','');expect((await read(page)).development.contractYears).toBe(end-y);
+   await confirmAdvance(page);s=await read(page);expect(s.development.contractYears).toBe(end-y);expect(s.contract15.active.endYear).toBe(end);await page.reload();await expect(page.locator('#createForm')).not.toHaveAttribute('inert','');expect((await read(page)).development.contractYears).toBe(end-y);
   }else{expect(m.kind).toBe('renewal');expect(m.offers.length).toBeGreaterThanOrEqual(3);}
  }
  expect(new Set((await read(page)).contract15.history.map(x=>x.year)).size).toBe((await read(page)).contract15.history.length);

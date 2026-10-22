@@ -143,8 +143,9 @@
   m.offers.forEach((o,i)=>{
    const n=o.negotiation,checked=o.id===m.selectedId;
    html+='<article class="contract-card" data-contract-card="'+i+'"><label class="contract-option"><input type="radio" name="contractPick" value="'+i+'" '+(checked?'checked':'')+'><span><strong>'+escapeHtml(o.team)+' · '+V5_NAMES[o.region]+'</strong><span class="contract-pay">연봉 '+money(o.amount)+' · '+o.years+'년</span><small>'+roleNames[o.role]+' · '+(m.kind==='continue'?'잔여 기간 유지':'계약 총액 '+money(o.amount*o.years))+'</small></span></label>';
+   html+='<button type="button" class="secondary small contract-inspect" data-open-contract="'+o.id+'">조건 자세히 보기</button>';
    if(m.kind!=='continue'){
-    html+='<p class="contract-fit">구단 수요 '+o.need+' · 관심 '+o.interest+' · '+(o.role==='core'?'상대적으로 많은 기용 기회를 검토':'출전 경쟁과 성적에 따라 역할 조정')+'</p>';
+    html+='<details class="contract-negotiation" '+(n?'open':'')+'><summary>구단과 조건 협상</summary><p class="contract-fit">구단 수요 '+o.need+' · 관심 '+o.interest+' · '+(o.role==='core'?'상대적으로 많은 기용 기회를 검토':'출전 경쟁과 성적에 따라 역할 조정')+'</p>';
     if(!n)html+='<div class="row negotiation-actions"><button type="button" class="secondary small" data-negotiate="salary" data-offer-id="'+o.id+'">연봉 20% 인상 요청</button><button type="button" class="secondary small" data-negotiate="role" data-offer-id="'+o.id+'" '+(o.role==='core'?'disabled':'')+'>역할 개선 요청</button></div>';
     else{
      const text={accepted:'요구 수락',counter:'구단 역제안',rejected:'요구 거절'}[n.result];
@@ -154,10 +155,11 @@
      else html+='<p>'+({accepted:'개선된 조건으로 계약할 수 있습니다.','accepted-counter':'역제안을 수락했습니다. 최종 계약은 다음 시즌 확정 시 적용됩니다.',declined:'원래 조건을 유지했습니다.',rejected:'원래 조건으로 계약할 수 있습니다.'}[n.status]||'')+'</p>';
      html+='</div>';
     }
+    html+='</details>';
    }
    html+='</article>';
   });
-  html+='<p class="screen-intro">구단별 협상은 한 번입니다. 다른 제안과 비교한 뒤 진로 확정 버튼으로 최종 계약합니다. 예상 역할·리그 적응은 첫 42팀 경기 동안 기용 평가에 반영되며 건강·실력 평가가 함께 적용됩니다.</p>';
+  html+='<p class="screen-intro">'+(m.kind==='continue'?'기존 계약의 남은 기간을 유지합니다. 최종 확인 후 다음 시즌을 시작합니다.</p>':'구단별 협상은 한 번입니다. 다른 제안과 비교한 뒤 진로 확정 버튼으로 최종 계약합니다. 예상 역할·리그 적응은 첫 42팀 경기 동안 기용 평가에 반영되며 건강·실력 평가가 함께 적용됩니다.</p>');
   root.innerHTML=html;
   for(const input of root.querySelectorAll('input'))input.onchange=()=>{m.selectedId=m.offers[Number(input.value)].id;if(!state.ui13)state.ui13={};if(!state.ui13.contracts)state.ui13.contracts={};state.ui13.contracts[state.year]=Number(input.value);save();};
   for(const b of root.querySelectorAll('[data-negotiate]'))b.onclick=()=>negotiate(b.dataset.offerId,b.dataset.negotiate);
@@ -170,7 +172,7 @@
   const rem=remaining(a);state.development.contractYears=rem;
   pane.innerHTML='<p class="page-eyebrow">MY CONTRACT</p><h2>나의 계약</h2><div class="report-rows"><div class="report-row"><span>계약 구단</span><b>'+escapeHtml(a.team)+'</b></div><div class="report-row"><span>연봉</span><b>'+money(a.annualSalary)+'</b></div><div class="report-row"><span>기간</span><b>'+a.startYear+'–'+a.endYear+' · '+rem+'시즌 남음</b></div><div class="report-row"><span>예상 역할</span><b>'+roleNames[a.role]+'</b></div></div><p class="screen-intro">'+(a.source==='legacy'?'이전 저장의 연봉·소속을 보존했습니다. 종료 연도는 기존 잔여 기간을 기준으로 연결했습니다.':'계약 기간은 현재 시즌을 포함합니다. 연봉은 시즌별 금액이며 계약 총액과 구분합니다.')+'</p><h3>최근 계약 이력</h3>'+(c.history.slice(-5).reverse().map(x=>'<div class="growth-row">'+(x.year+1)+' · '+escapeHtml(x.team)+' · '+money(x.annualSalary)+' · '+x.endYear+'년 종료 · '+(x.type==='continue'?'기존 계약 유지':'새 계약')+'</div>').join('')||'<p class="screen-intro">다음 시즌 계약을 확정하면 이력이 쌓입니다.</p>');
  }
- window.DiamondContracts=Object.freeze({offers,advance,marketView,rookie,selectionAdjustment,evaluate});
+ window.DiamondContracts=Object.freeze({offers,advance,marketView,rookie,selectionAdjustment,evaluate,canAdvance});
  render=function(){if(pro())ensure();previousRender();view();};
  setup=function(){previousSetup();$('createForm').addEventListener('submit',()=>{if(!state||state.game||state.career.length)return;if(!pro()){delete state.contract15;return;}rookie('draft');save();render();});};
  nextSeason=function(){if(pro()&&!state.retired&&state.game===144&&state.age<40&&!canAdvance())return;return previousNext();};

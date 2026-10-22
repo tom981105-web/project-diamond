@@ -1,9 +1,17 @@
+async function runSeason(page,selector='#seasonBtn'){
+ await page.click(selector);
+ if(await page.locator('#seasonProgressDialog').isVisible()){
+  const skip=page.locator('#skipSeasonAnimation');if(await skip.isEnabled()){try{await skip.click({timeout:1000});}catch(error){if(await page.locator('#seasonProgressDialog').isVisible())throw error;}}
+  await page.locator('#seasonProgressDialog').waitFor({state:'hidden'});
+ }
+}
 async function finishSeason(page){
+ await page.emulateMedia({reducedMotion:'reduce'});
  for(let step=0;step<100;step++){
   const status=await page.evaluate(()=>({game:state.game,pending:!!state.career14?.pending}));
   if(status.game>=144)return;
   if(status.pending)await page.locator('[data-career-choice]').first().click();
-  else await page.click('#seasonBtn');
+  else await runSeason(page);
  }
  throw Error('Season did not finish within 100 career decisions');
 }
@@ -25,4 +33,4 @@ async function confirmAdvance(page){
  await page.click('#nextBtn');
  if(await page.locator('#careerAdvanceDialog').isVisible())await page.click('#confirmCareerAdvance');
 }
-module.exports={finishSeason,advanceGames,openDetails,confirmAdvance};
+module.exports={finishSeason,advanceGames,openDetails,confirmAdvance,runSeason};

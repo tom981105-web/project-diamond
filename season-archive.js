@@ -8,6 +8,7 @@
  const health=n=>Number.isFinite(n)?String(Math.round(n)):'미기록';
  const number=n=>Number.isFinite(n)?String(n):'미기록';
  const text=v=>escapeHtml(String(v??'미기록'));
+ const effect=v=>String(v??'미기록').replace(/[+-]?\d+\.\d+/g,n=>(n.startsWith('+')?'+':'')+String(Math.round(Number(n)*10)/10));
  const row=(label,value)=>'<div class="decision-row"><span>'+text(label)+'</span><strong>'+text(value)+'</strong></div>';
  let context=null;
  function snapshot(){
@@ -63,7 +64,7 @@
   const tournament=state.v6?.tournaments?.[year];if(tournament)html+='<h2>국제대회</h2><p>'+text(tournament.selected?'국가대표 선발 · '+tournament.medal:'국가대표 미선발')+'</p><p class="review-footnote">가상 대회 선발·메달 기록입니다. 프로 정규시즌 개인 성적과 구분합니다.</p>';
   const moments=objects(d?.moments),choice=objects(state.ui13?.choices).find(x=>x.year===year),contract=objects(state.contract15?.history).find(x=>x.year===year);
   html+='<h2>커리어의 순간</h2>'+(moments.length?moments.map(x=>'<div class="history-choice">'+number(x.game)+'경기 · '+text(x.title)+'<br><small>'+text(({practice:'훈련 재개',rest:'회복 우선',rehab:'재활 집중'})[x.choice]||x.choice)+'</small></div>').join(''):'<p class="decision-note">보관된 경기 중 선택 내역이 없습니다.</p>');
-  if(choice)html+='<p class="decision-note">다음 시즌 육성: '+text(choice.title)+' · '+text(choice.effect)+'</p>';
+  if(choice)html+='<p class="decision-note">다음 시즌 육성: '+text(choice.title)+' · '+text(effect(choice.effect))+'</p>';
   if(contract)html+='<p class="decision-note">다음 시즌 계약: '+text(contract.team)+' · 연봉 '+text(Number(contract.annualSalary).toLocaleString())+'만원 · '+number(contract.endYear)+'년 종료</p>';
   html+='<p class="review-footnote">완료한 프로 정규시즌 기록입니다. 열람은 경기·계약·육성 방향을 확정하지 않습니다.</p>';
   $('archiveContent').innerHTML=html;

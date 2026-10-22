@@ -1,3 +1,7 @@
+# PROJECT DIAMOND V2.8
+
+기존 캐릭터 6종의 스윙·투구 준비·휴식 자세를 적용했습니다. [표시 조건·자산·생성 프롬프트](docs/ACTION-POSES-V2.8.md)를 확인하세요.
+
 # PROJECT DIAMOND V2.7
 
 실제 훈련·휴식·부상·기용 기록에 맞춘 선수 준비 장면을 추가했습니다. [표시 기준과 저장 보호](docs/PLAYER-SCENES-V2.7.md)를 확인하세요.

@@ -4,6 +4,21 @@
  const baseRender=render,baseSetup=setup,baseLayout=window.DiamondUI.layout;
  const text=v=>escapeHtml(String(v??''));
  let owner=null;
+ const atlases=new Map();
+ function pose(s){
+  if(['rest','rehab'].includes(s.mode))return 2;
+  if(s.mode==='retired')return null;
+  if(s.mode==='practice'&&state.role==='batter'&&state.development.focus>=3)return null;
+  return state.role==='pitcher'?1:0;
+ }
+ function atlas(index){
+  if(!atlases.has(index)){
+   const image=new Image(),record={ready:false};atlases.set(index,record);
+   image.onload=()=>{record.ready=image.naturalWidth===image.naturalHeight*3;if(record.ready)document.querySelectorAll('[data-avatar28="'+index+'"]').forEach(n=>{if(n.querySelector('.action-pose28'))n.classList.add('pose-ready28');});};
+   image.src=window.DiamondVisualAssets?.actions?.[index]||'';
+  }
+  return atlases.get(index).ready;
+ }
  function status(){
   const d=state.development||{},p=state.career14?.plan,active=p&&p.end>state.game;
   if(state.retired)return {mode:'retired',title:'그라운드를 돌아보며',detail:'선수 생활을 마친 뒤의 기록을 돌아봅니다.'};
@@ -15,8 +30,8 @@
   return {mode:state.role==='pitcher'?'pitcher':'batter',title:state.role==='pitcher'?'다음 등판을 준비하며':'다음 타석을 준비하며',detail:'현재 컨디션 '+Math.round(d.condition)+' · 피로 '+Math.round(d.fatigue)};
  }
  function art(s){
-  const indoor=['rest','rehab','practice'].includes(s.mode),src=window.DiamondVisualAssets?.portraits?.[Number(state.ui13?.avatar)||0];
-  return '<div class="player-scene27" data-scene="'+s.mode+'"><svg viewBox="0 0 480 170" preserveAspectRatio="xMidYMid slice" aria-hidden="true">'+(indoor?'<rect width="480" height="170" fill="#edf2f3"/><path d="M0 111H480V170H0Z" fill="#e0e8e9"/><path d="M20 20H140V87H20ZM340 20H460V87H340Z" fill="#f9fbfc" stroke="#d4dfe3"/><path d="M80 20V87M400 20V87M20 53H140M340 53H460" stroke="#d4dfe3"/><path d="M300 118H410V130H300ZM313 130V148M399 130V148" stroke="#8da9a0" stroke-width="5" fill="none"/>':'<rect width="480" height="170" fill="#edf4fa"/><path d="M0 76Q240 25 480 76V170H0Z" fill="#dcebe1"/><path d="M240 160 166 111 240 62 314 111Z" fill="#e7d9c2"/><path d="M240 160 166 111 240 62 314 111Z" stroke="#fff" stroke-width="2" fill="none"/><circle cx="240" cy="111" r="5" fill="#cbb598"/><path d="M0 73Q240 21 480 73" fill="none" stroke="#adc6b6" stroke-width="4"/>')+'</svg>'+(src?'<img src="'+text(src)+'" alt="선택한 선수의 준비 모습">':'')+'<span class="scene-shadow27" aria-hidden="true"></span></div>';
+  const indoor=['rest','rehab','practice'].includes(s.mode),index=Number(state.ui13?.avatar)||0,src=window.DiamondVisualAssets?.portraits?.[index],frame=pose(s),action=window.DiamondVisualAssets?.actions?.[index],ready=frame!==null&&action&&atlas(index),left=frame===0?state.hand?.includes('좌타'):frame===1?state.hand?.startsWith('좌투'):false;
+  return '<div class="player-scene27'+(ready?' pose-ready28':'')+'" data-avatar28="'+index+'" data-scene="'+s.mode+'"><svg viewBox="0 0 480 170" preserveAspectRatio="xMidYMid slice" aria-hidden="true">'+(indoor?'<rect width="480" height="170" fill="#edf2f3"/><path d="M0 111H480V170H0Z" fill="#e0e8e9"/><path d="M20 20H140V87H20ZM340 20H460V87H340Z" fill="#f9fbfc" stroke="#d4dfe3"/><path d="M80 20V87M400 20V87M20 53H140M340 53H460" stroke="#d4dfe3"/><path d="M300 118H410V130H300ZM313 130V148M399 130V148" stroke="#8da9a0" stroke-width="5" fill="none"/>':'<rect width="480" height="170" fill="#edf4fa"/><path d="M0 76Q240 25 480 76V170H0Z" fill="#dcebe1"/><path d="M240 160 166 111 240 62 314 111Z" fill="#e7d9c2"/><path d="M240 160 166 111 240 62 314 111Z" stroke="#fff" stroke-width="2" fill="none"/><circle cx="240" cy="111" r="5" fill="#cbb598"/><path d="M0 73Q240 21 480 73" fill="none" stroke="#adc6b6" stroke-width="4"/>')+'</svg>'+(src?'<img class="scene-portrait28" src="'+text(src)+'" alt="선택한 선수의 준비 모습">':'')+(frame!==null&&action?'<span class="action-pose28'+(left?' pose-left28':'')+'" role="img" aria-label="'+['스윙 연습 자세','투구 준비 자세','앉아서 쉬는 자세'][frame]+'" data-pose="'+frame+'" style="background-image:url(&quot;'+text(action)+'&quot;)"></span>':'')+'<span class="scene-shadow27" aria-hidden="true"></span></div>';
  }
  function facts(s){
   const d=state.development,focus=[d.focus,d.secondaryFocus].filter((v,i,a)=>Number.isInteger(v)&&v>=0&&v<6&&a.indexOf(v)===i).map(i=>ATTR[state.role][i]);

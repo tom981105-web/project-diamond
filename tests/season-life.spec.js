@@ -4,8 +4,8 @@ async function create(page,role='batter',college=false){await page.goto('./');aw
 const saved=page=>page.evaluate(()=>({state:JSON.stringify(state),raw:localStorage.getItem(KEY)}));
 test('current priorities follow choices, injury, recovery, second team, health and preparation without applying plans',async({page})=>{
  await create(page);
- for(const f of [{kind:'choice',pending:true,injury:3},{kind:'rehab',injury:3,plan:'rest'},{kind:'rest',plan:'rest',level:'2군'},{kind:'reserve',level:'2군'},{kind:'health',fatigue:75},{kind:'prepare'}]){
-  await page.evaluate(f=>{state.development.injury=f.injury||0;state.development.level=f.level||'1군';state.development.fatigue=f.fatigue||0;state.development.condition=90;state.career14.pending=f.pending?{id:'test-injury',type:'injury',year:state.year,game:state.game,title:'부상 확인',detail:'실제 선택을 먼저 확인합니다'}:null;state.career14.plan=f.plan?{mode:f.plan,end:7,focus:0,intensity:'rest'}:null;save();render();},f);
+ for(const f of [{kind:'choice',pending:true,injury:3},{kind:'rehab',injury:3,plan:'rest'},{kind:'rest',plan:'rest',level:'2군'},{kind:'rest',intensity:'rest'},{kind:'reserve',level:'2군'},{kind:'health',fatigue:75},{kind:'prepare'}]){
+  await page.evaluate(f=>{state.development.intensity=f.intensity||'normal';state.development.injury=f.injury||0;state.development.level=f.level||'1군';state.development.fatigue=f.fatigue||0;state.development.condition=90;state.career14.pending=f.pending?{id:'test-injury',type:'injury',year:state.year,game:state.game,title:'부상 확인',detail:'실제 선택을 먼저 확인합니다'}:null;state.career14.plan=f.plan?{mode:f.plan,end:7,focus:0,intensity:'rest'}:null;save();render();},f);
   const before=await saved(page);await expect(page.locator('#seasonSituation31')).toHaveAttribute('data-situation',f.kind);if(f.kind!=='choice'){await page.click('#prepareAction31');await expect(page.locator('#weeklyPlans')).toHaveAttribute('open','');}else{await page.click('#prepareAction31');await expect(page.locator('#careerMomentDialog')).toBeVisible();await page.press('#careerMomentDialog','Escape');}expect(await saved(page)).toEqual(before);
  }
 });

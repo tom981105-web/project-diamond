@@ -11,6 +11,7 @@
   if(window.DiamondStories22?.blocks())return {kind:'choice',title:story.title,detail:'일정을 멈추고 기다리는 선택이 있습니다. 선택 후 보관된 일정을 이어갈 수 있습니다.',action:'이야기와 선택 확인',target:'story'};
   if(d.injury>0)return {kind:'rehab',title:'복귀를 준비하는 시간',detail:'남은 부상 기간 '+d.injury+'팀 경기. 이 기간의 공식 출전 기록은 늘어나지 않습니다.',action:'회복 계획 살펴보기',target:'plan'};
   if(p&&p.end>state.game&&['rest','rehab'].includes(p.mode))return {kind:'rest',title:'지금은 몸을 회복할 때',detail:modeName(p.mode)+' 계획 '+(p.end-state.game)+'팀 경기 남음 · 계획 중에는 공식 출전과 훈련 성장을 쌓지 않습니다.',action:'확정한 계획 보기',target:'plan'};
+  if((!p||p.end<=state.game)&&d.intensity==='rest')return {kind:'rest',title:'기본 휴식으로 몸을 회복하며',detail:'현재 기본 설정은 휴식입니다. 공식 출전과 훈련 성장을 쉬며, 준비를 재개하려면 훈련 계획을 확인하세요.',action:'훈련·휴식 계획 보기',target:'plan'};
   if(d.level==='2군')return {kind:'reserve',title:'다음 기회를 준비합니다',detail:'2군 훈련 중입니다. 구단 신뢰와 컨디션을 쌓아 1군 복귀 평가를 준비합니다.',action:'훈련 계획 살펴보기',target:'plan'};
   if(d.fatigue>60||d.condition<45)return {kind:'health',title:'다음 일정 전, 몸 상태 점검',detail:'컨디션 '+Math.round(d.condition)+' · 피로 '+Math.round(d.fatigue)+'. 훈련 강도와 회복 계획을 함께 살펴보세요.',action:'훈련·휴식 계획 보기',target:'plan'};
   return {kind:'prepare',title:c.role==='starter'?(state.role==='batter'?'출전 기회를 이어 가며':'다음 등판을 준비하며'):'출전 경쟁을 이어 갑니다',detail:p&&p.end>state.game?modeName(p.mode)+' 계획 '+(p.end-state.game)+'팀 경기 남음':'현재 집중 과제를 이어가며 실제 경기 기용 평가를 받습니다.',action:'훈련 계획 살펴보기',target:'plan'};

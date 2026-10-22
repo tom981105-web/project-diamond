@@ -72,3 +72,10 @@ test('fielding skill reaches opponent at-bats; weekly UI fits mobile with a pend
  await expect(page.locator('#careerEvent')).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await expect(page.locator('[data-career-choice=rest]')).toBeVisible();
  await page.click('[data-tab=training]');await expect(page.locator('#coachPanel')).toBeVisible();await expect(page.locator('#developmentHistory')).toBeVisible();
 });
+
+test('a seven-game fielding plan receives growth after five subsequent batting-practice days',async({page})=>{
+ await start(page);const before=await read(page);await page.click('[data-week-plan=defense]');await page.click('#weekBtn');
+ await page.click('[data-week-plan=practice]');for(let i=0;i<5;i++)await page.click('#oneBtn');const after=await read(page);
+ expect(after.game).toBe(12);expect(after.attributes[4]).toBe(before.attributes[4]+1);expect(after.attributes[0]).toBe(before.attributes[0]);
+ expect(after.career14.growth.filter(x=>x.source==='훈련 성장').map(x=>x.index)).toEqual([4]);
+});

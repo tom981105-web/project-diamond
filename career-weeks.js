@@ -11,11 +11,12 @@
   const c=state.career14;
   for(const key of ['history','growth','weeks','recent'])if(!Array.isArray(c[key]))c[key]=[];
   if(c.year!==state.year){
-   c.year=state.year;c.recent=[];c.role=null;c.pending=null;c.remaining=0;c.plan=null;c.week=null;c.practiceDays=0;c.hardDays=0;c.experience=0;
+   c.year=state.year;c.recent=[];c.role=null;c.pending=null;c.remaining=0;c.plan=null;c.week=null;c.practiceDays=0;c.hardDays=0;c.practiceByFocus=[0,0,0,0,0,0];c.experience=0;
   }
   if(!Number.isFinite(c.experience)||c.experience<0)c.experience=0;
   if(!Number.isInteger(c.practiceDays))c.practiceDays=0;
   if(!Number.isInteger(c.hardDays))c.hardDays=0;
+  if(!Array.isArray(c.practiceByFocus)||c.practiceByFocus.length!==6)c.practiceByFocus=[0,0,0,0,0,0];
   if(!Number.isInteger(c.remaining)||c.remaining<0)c.remaining=0;
   return c;
  }
@@ -34,10 +35,10 @@
   if(p&&p.end>state.game&&modes.includes(p.mode))return p;
   return {mode:d.intensity==='rest'?'rest':'practice',focus:d.focus,intensity:d.intensity,end:Math.min(144,state.game+7),automatic:true};
  }
- function trainingFocus(plan){
+ function trainingFocus(plan,checkpoint=state.game){
   if(plan.mode==='defense')return state.role==='batter'?4:3;
   const d=state.development;
-  return Number.isInteger(d.secondaryFocus)&&d.secondaryFocus>=0&&d.secondaryFocus<6&&state.game%24===0?d.secondaryFocus:plan.focus;
+  return Number.isInteger(d.secondaryFocus)&&d.secondaryFocus>=0&&d.secondaryFocus<6&&checkpoint%24===0?d.secondaryFocus:plan.focus;
  }
  function grow(index,amount,source){
   const c=ensure(),before=state.attributes[index],cap=Math.max(before,Math.min(99,state.potential));
@@ -84,12 +85,17 @@
    d.fatigue=clamp(d.fatigue+(delta.G?1:0)+(hard?2:0)-(state.game%4===0?3:0),0,100);
    d.condition=clamp(d.condition-(hard?1.1:.6)+(state.game%6===0?2:0),0,100);
    c.practiceDays++;if(hard)c.hardDays++;
+   c.practiceByFocus[trainingFocus(r.plan,Math.ceil(state.game/12)*12)]++;
   }
   // The scheduled training award is proportional to actual practice days in the block.
   if(state.game%12===0){
-   if(state.age<=32&&c.practiceDays>=6){const points=c.hardDays>=6?2:1;d.lastTraining=grow(trainingFocus(r.plan),points,'훈련 성장');}
+   if(state.age<=32&&c.practiceDays>=6){
+    const points=c.hardDays>=6?2:1,maxDays=Math.max(...c.practiceByFocus);
+    const preferred=trainingFocus(r.plan),index=c.practiceByFocus[preferred]===maxDays?preferred:c.practiceByFocus.indexOf(maxDays);
+    d.lastTraining=grow(index,points,'훈련 성장');
+   }
    else d.lastTraining=0;
-   c.practiceDays=0;c.hardDays=0;
+   c.practiceDays=0;c.hardDays=0;c.practiceByFocus=[0,0,0,0,0,0];
   }
   // Only actual major-league appearances/outs earn experience; no retroactive awards.
   c.experience+=state.role==='batter'?delta.G:delta.IPouts/3;

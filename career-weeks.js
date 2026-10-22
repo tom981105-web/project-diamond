@@ -154,14 +154,14 @@
   const names={practice:state.role==='batter'?'타격 집중':'투구 집중',defense:state.role==='batter'?'수비 집중':'변화구 집중',rest:'휴식',rehab:'재활'};
   const descriptions={practice:FOCI[state.role][d.focus][1]+' · '+(d.intensity==='hard'?'강훈련':'일반 훈련'),defense:(state.role==='batter'?'수비':'변화구')+' 훈련에 집중',rest:'출전·훈련 없이 몸 상태 회복',rehab:'부상 기간 회복 · 프로 출전 없음'};
   const expanded=root.querySelector('#weeklyPlans')?.open||!!c.plan;
-  let html='<div class="section-title-row"><h3>시즌의 준비</h3><span class="roster-chip">'+escapeHtml(status)+'</span></div>';
+  let html='<div class="section-title-row"><h3>이번 시즌의 역할</h3><span class="roster-chip">'+escapeHtml(status)+'</span></div><div class="season-roster-rows"><div><span>소속</span><strong>'+escapeHtml(state.team)+' · '+escapeHtml(d.level)+'</strong></div><div><span>포지션</span><strong>'+escapeHtml(state.position)+'</strong></div></div>';
   if(c.pending){
    const event=c.pending;
    html+='<div id="careerEvent" class="career-event" role="status"><p class="page-eyebrow">CAREER MOMENT · '+event.game+'경기</p><h3>'+escapeHtml(event.title)+'</h3><p>'+escapeHtml(event.detail)+'</p><p class="screen-intro">요청한 일정을 멈췄습니다. 남은 '+c.remaining+'팀 경기'+(c.remaining?'는 선택 후 이어갈 수 있습니다.':'입니다.')+'</p><button type="button" class="secondary small" id="inspectCareerEvent">상황과 선택 자세히 보기</button><div class="row">';
    const options=event.type==='injury'?[['rest','재활 계획 확인']]:[['train','훈련과 경쟁 재개'],['rest','7경기 회복 우선']];
    html+=options.map(([id,title])=>'<button type="button" data-career-choice="'+id+'">'+title+'</button>').join('')+'</div></div>';
   }else{
-   html+='<p class="screen-intro">집중 과제: '+escapeHtml(FOCI[state.role][d.focus][1])+' · 컨디션 '+Math.round(d.condition)+' · 피로 '+Math.round(d.fatigue)+'</p><details id="weeklyPlans" '+(expanded?'open':'')+'><summary>훈련·휴식 계획 자세히</summary><p class="screen-intro">'+(c.plan?'확정한 계획 · '+(c.plan.end-state.game)+'팀 경기 남음':'현재 기본 계획: '+names[p.mode]+' · 필요할 때 7경기 계획을 확정하세요.')+'</p><div class="week-plans">';
+   html+='<details id="weeklyPlans" '+(expanded?'open':'')+'><summary>훈련·휴식 계획 <span>컨디션 '+Math.round(d.condition)+' · 피로 '+Math.round(d.fatigue)+'</span></summary><p class="screen-intro">집중 과제: '+escapeHtml(FOCI[state.role][d.focus][1])+'</p><p class="screen-intro">'+(c.plan?'확정한 계획 · '+(c.plan.end-state.game)+'팀 경기 남음':'현재 기본 계획: '+names[p.mode]+' · 필요할 때 7경기 계획을 확정하세요.')+'</p><div class="week-plans">';
    for(const mode of modes){const disabled=!!c.plan||(mode==='rehab'&&!d.injury);html+='<button type="button" class="week-plan'+(c.plan?.mode===mode?' selected':'')+'" data-week-plan="'+mode+'" aria-pressed="'+(c.plan?.mode===mode)+'" '+(disabled?'disabled':'')+'><strong>'+names[mode]+'</strong><small>'+escapeHtml(descriptions[mode])+'</small></button>';}
    html+='</div><p class="screen-intro">확정한 계획은 7팀 경기 동안 유지됩니다. 훈련 성과는 실제 훈련일을, 실전 성장은 실제 출장·투구 이닝을 계산합니다.</p></details>';
    if(c.remaining>0)html+='<button type="button" id="continueCareer" class="main-action">남은 '+c.remaining+'경기 이어가기</button>';

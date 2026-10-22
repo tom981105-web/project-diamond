@@ -5,6 +5,7 @@
  const text=value=>escapeHtml(String(value??''));
  const school=()=>!!(state?.v12?.college&&!state.v12.college.completed);
  const focus=()=>[state.development?.focus,state.development?.secondaryFocus].filter((v,i,a)=>Number.isInteger(v)&&a.indexOf(v)===i).map(i=>ATTR[state.role][i]).join(' · ');
+ const trend='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m4 17 6-6 4 3 6-9m-6 0h6v6"/></svg>';
  const icon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 21V4m0 1c4-4 8 4 12 0v9c-4 4-8-4-12 0"/></svg>';
  function section(id,parent){let node=$(id);if(!node){node=document.createElement('section');node.id=id;node.className='surface-card';parent.append(node);}return node;}
  function phase(){
@@ -31,7 +32,7 @@
   const node=$(id);if(id==='seasonStory')window.scrollTo({top:0,behavior:'instant'});else node?.scrollIntoView({block:'start',behavior:'instant'});
   if(node){node.tabIndex=-1;node.focus({preventScroll:true});}
  }
- function row(id,title,detail,target,urgent=false){return '<button type="button" class="flow-task" id="'+id+'" data-flow-target="'+target+'"><span class="flow-task-icon">'+icon+'</span><span class="flow-task-copy"><strong>'+text(title)+(urgent?'<i class="task-dot" aria-label="확인 필요"></i>':'')+'</strong><small>'+text(detail)+'</small></span><span class="flow-chevron" aria-hidden="true">›</span></button>';}
+ function row(id,title,detail,target,urgent=false){return '<button type="button" class="flow-task" id="'+id+'" data-flow-target="'+target+'"><span class="flow-task-icon">'+(target==='player'?trend:icon)+'</span><span class="flow-task-copy"><strong>'+text(title)+(urgent?'<i class="task-dot" aria-label="확인 필요"></i>':'')+'</strong><small>'+text(detail)+'</small></span><span class="flow-chevron" aria-hidden="true">›</span></button>';}
  function home(p){
   const copy=$('homeIdentityCopy');if(!$('homeRating')){const rating=document.createElement('div');rating.id='homeRating';copy.append(rating);}
   const base=state.ui13?.baselines?.[state.year],before=Array.isArray(base)&&base.length===6?Math.round(base.reduce((a,b)=>a+b,0)/6):null,delta=before===null?null:overall()-before;
@@ -71,7 +72,13 @@
   story.innerHTML='<p class="flow-eyebrow">'+(step>=0?'다음 이야기':p.id==='moment'?'커리어의 전환점':state.year+' 시즌')+'</p><h2>'+text(p.title)+'</h2><p>'+text(p.detail)+'</p>'+(step>=0?'<ol class="flow-steps" aria-label="다음 시즌 준비 단계">'+['시즌 결산','육성 방향',p.id==='retirement'?'커리어 마무리':'계약과 진로'].map((label,i)=>'<li'+(i===step?' aria-current="step"':'')+' class="'+(i<step?'complete':'')+'"><span>'+(i<step?'✓':i+1)+'</span>'+label+'</li>').join('')+'</ol>':'');
   if(['season','college','entry'].includes(p.id)){
    const count=school()?state.v12.college.results.length:state.game,limit=school()?36:144;
-   const metrics=school()?[]:(state.role==='batter'?[['출장',state.current.G],['타율',state.current.AB?statline(state.current,state.role).AVG:'—'],['홈런',state.current.HR]]:[['등판',state.current.G],['평균자책점',state.current.IPouts?statline(state.current,state.role).ERA:'—'],['탈삼진',state.current.PK]]);
+   const bat=state.role==='batter',metrics=school()?[]:(bat?[['출장',state.current.G+'경기'],['안타',state.current.H],['홈런',state.current.HR]]:[['등판',state.current.G+'경기'],['승리',state.current.W],['탈삼진',state.current.PK]]);
+   if(!school()){
+    const base=state.ui13?.baselines?.[state.year],delta=Array.isArray(base)&&base.length===6?overall()-Math.round(base.reduce((a,b)=>a+b,0)/6):null;
+    story.querySelector('.flow-eyebrow').textContent=state.year+' 시즌 · '+state.team;
+    story.querySelector('h2').innerHTML='<span class="season-rate-label">'+(bat?'타율':'평균자책점')+'</span> <strong id="seasonPrimaryMetric">'+(bat?(state.current.AB?statline(state.current,state.role).AVG:'—'):(state.current.IPouts?statline(state.current,state.role).ERA:'—'))+'</strong>';
+    story.querySelector('h2+p').outerHTML='<p class="season-growth">종합 능력 '+overall()+(delta?' <span class="'+(delta>0?'up':'down')+'">'+(delta>0?'+':'')+delta+'</span>':'')+' <small>· '+(state.game?'시즌 진행 중':'개막 준비')+'</small></p>';
+   }
    story.insertAdjacentHTML('beforeend','<div class="chapter-progress" aria-label="시즌 진행"><span>'+count+' / '+limit+'팀 경기</span><strong>'+Math.round(count/limit*100)+'%</strong><progress max="'+limit+'" value="'+count+'" aria-label="시즌 완료 경기"></progress></div>'+(metrics.length?'<div class="chapter-stats">'+metrics.map(([label,value])=>'<div><small>'+label+'</small><strong>'+text(value)+'</strong></div>').join('')+'</div>':''));
   }
   if(p.id==='story'||p.id==='moment'||p.id==='review'){

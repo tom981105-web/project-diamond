@@ -59,7 +59,7 @@
    if(last?.year===state.year&&last.game===state.game&&plan){
     const name={rehab:'재활에 집중합니다',rest:'회복을 먼저 챙깁니다',practice:'훈련과 출전 경쟁을 재개합니다'}[last.choice];
     root.innerHTML='<p class="flow-eyebrow">나의 선택</p><h3>'+text(name)+'</h3><p>'+text(last.title)+' · '+(plan.end-state.game)+'팀 경기 계획을 저장했습니다. 아직 경기는 진행하지 않았습니다.</p><p class="screen-intro">'+(last.choice==='practice'?'다음 진행부터 실제 훈련·기용 평가가 적용됩니다.':'다음 진행부터 회복을 계산합니다. 이 계획 중에는 공식 출전 기록이 늘어나지 않습니다.')+'</p>';
-    root.hidden=false;$('careerWeek').before(root);
+    root.hidden=false;if($('careerWeek'))$('careerWeek').before(root);
    }
   }
  }

@@ -1,5 +1,5 @@
 const {test,expect}=require('@playwright/test');
-test.beforeEach(async({page})=>{await page.goto('/');await expect(page.locator('#createForm')).not.toHaveAttribute('inert','');await page.click('button[type=submit]');});
+test.beforeEach(async({page})=>{await page.goto('./');await expect(page.locator('#createForm')).not.toHaveAttribute('inert','');await page.click('#startJourney');for(let i=0;i<3;i++)await page.click('#wizardNext');await page.click('button[type=submit]');});
 test('singles advance each existing runner one base; grand slam scores four',async({page})=>{
   const result=await page.evaluate(()=>{
     const original=atBat;const lineup=Array.from({length:9},()=>({name:'검증',user:false}));
@@ -33,5 +33,5 @@ test('sacrifice fly needs a runner on third and fewer than two outs; loaded walk
 
 test('release scripts use one cache version',async({page})=>{
   const scripts=await page.locator('script[src]').evaluateAll(nodes=>nodes.map(n=>new URL(n.src).searchParams.get('v')));
-  expect(scripts.length).toBeGreaterThan(10);expect(new Set(scripts)).toEqual(new Set(['1.2.1']));
+  expect(scripts.length).toBeGreaterThan(10);expect(new Set(scripts)).toEqual(new Set(['1.3']));
 });

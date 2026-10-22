@@ -71,7 +71,7 @@ test('fielding skill reaches opponent at-bats; weekly UI fits mobile with a pend
  });expect(observed).toEqual(expect.arrayContaining([74,60]));
  await page.evaluate(()=>{state.development.fatigue=99;state.development.intensity='hard';const random=Math.random;Math.random=()=>0;try{play(144);}finally{Math.random=random;}});
  await expect(page.locator('#careerEvent')).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await expect(page.locator('[data-career-choice=rest]')).toBeVisible();
- await page.click('[data-tab=training]');await expect(page.locator('#coachPanel')).toBeVisible();await expect(page.locator('#developmentHistory')).toBeVisible();
+ await page.click('[data-tab=training]');await page.click('#playerCoachDetails summary');await expect(page.locator('#coachPanel')).toBeVisible();await expect(page.locator('#developmentHistory')).toBeVisible();
 });
 
 test('a seven-game fielding plan receives growth after five subsequent batting-practice days',async({page})=>{

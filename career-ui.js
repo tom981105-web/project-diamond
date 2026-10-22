@@ -7,10 +7,11 @@
  const txt=v=>escapeHtml(String(v??''));
  let decorating=false;
  function face(target,index,fallback){
-  target.innerHTML=fallback;target.querySelector('svg')?.removeAttribute('hidden');
   const source=window.DiamondVisualAssets?.portraits?.[index];
+  if(source&&target.querySelector('.career-portrait-image')?.getAttribute('src')===source)return;
+  target.innerHTML=fallback;target.querySelector('svg')?.removeAttribute('hidden');
   if(typeof source!=='string'||!source)return;
-  const image=document.createElement('img');image.alt='야구 선수 아바타';image.className='career-portrait-image';image.src=source;
+  const image=document.createElement('img');image.alt='야구 선수 아바타';image.decoding='async';image.className='career-portrait-image';image.src=source;
   image.onload=()=>{if(image.parentNode===target)target.querySelector('svg')?.setAttribute('hidden','');};
   image.onerror=()=>{image.remove();target.querySelector('svg')?.removeAttribute('hidden');};
   target.append(image);
@@ -22,7 +23,7 @@
   face($('avatarPreview'),Number(selected.dataset.avatar),selected.querySelector('svg')?.outerHTML||'');
   for(const button of document.querySelectorAll('.avatar-choice')){face(button,Number(button.dataset.avatar),button.querySelector('svg')?.outerHTML||'');button.setAttribute('aria-pressed',String(button===selected));}
  }
- function stageArt(index){const target=$('landingJourney').querySelector('.journey-placeholder');target.querySelector('img')?.remove();target.classList.remove('has-scene');const src=window.DiamondVisualAssets?.milestones?.[index];if(typeof src!=='string'||!src)return;const image=document.createElement('img');image.alt='야구 커리어 장면';image.className='journey-stage-image';target.classList.add('has-scene');image.onerror=()=>{image.remove();target.classList.remove('has-scene');};image.src=src;target.append(image);}
+ function stageArt(index){const target=$('landingJourney').querySelector('.journey-placeholder');target.querySelector('img')?.remove();target.classList.remove('has-scene');const src=window.DiamondVisualAssets?.milestones?.[index];if(typeof src!=='string'||!src)return;const image=document.createElement('img');image.alt='야구 커리어 장면';image.decoding='async';image.className='journey-stage-image';target.classList.add('has-scene');image.onerror=()=>{image.remove();target.classList.remove('has-scene');};image.src=src;target.append(image);}
  function landing(){
   if($('landingJourney'))return;
   const section=el('section','landingJourney','<div class="journey-placeholder" aria-hidden="true"><span class="diamond-field"></span><span class="journey-ball">⚾</span></div><p id="landingJourneyCaption">첫 그라운드에 서는 날</p><div id="landingJourneySteps" aria-label="커리어 여정"></div>','landing-journey');
@@ -73,5 +74,6 @@
  window.DiamondUI.layout=function(){baseLayout();decorate();};
  render=function(){baseRender();decorate();};setup=function(){baseSetup();decorate();};
  document.addEventListener('click',event=>{if(event.target.closest('.avatar-choice,#wizardNext,#wizardBack,#startJourney'))creation();if(event.target.closest('#startJourney,#wizardBack'))window.scrollTo({top:0,behavior:'instant'});});
+ document.addEventListener('keydown',event=>{const current=event.target.closest('.avatar-choice');if(!current||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(event.key))return;event.preventDefault();const buttons=[...document.querySelectorAll('.avatar-choice')],index=buttons.indexOf(current),columns=getComputedStyle(current.parentNode).gridTemplateColumns.split(' ').length;let next=event.key==='Home'?0:event.key==='End'?buttons.length-1:(index+({ArrowLeft:-1,ArrowRight:1,ArrowUp:-columns,ArrowDown:columns}[event.key])+buttons.length)%buttons.length;buttons[next].click();buttons[next].focus();});
  window.addEventListener('diamond-slot-change',decorate);
 })();

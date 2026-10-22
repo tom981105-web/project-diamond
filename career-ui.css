@@ -99,3 +99,12 @@ body.career-ui{background:#f3f4f6;color:var(--ink);font-size:14px;letter-spacing
 .career-ui .journey-placeholder.has-scene{height:auto;aspect-ratio:16/9;background:#edf2f8}
 .career-ui .has-scene .journey-stage-image{object-fit:contain}
 .career-ui .timeline-review{display:block}
+
+/* V1.11: six supplied full-body portraits fit a compact, keyboard-accessible chooser. */
+.career-ui .avatar-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin:18px 0}
+.career-ui .avatar-choice{aspect-ratio:4/5;min-height:0;max-height:150px;background:#f7f8fa;border:2px solid transparent}
+.career-ui .avatar-choice:hover{background:#edf3fc;border-color:#c4d6f4}
+.career-ui .avatar-choice.selected,.career-ui .avatar-choice.selected:hover{background:#edf4ff;border-color:#74a0ec}
+.career-ui #wizardBack,.career-ui #wizardBack:hover{background:transparent;color:#687b96;padding:0 4px;min-height:36px}
+.career-ui .avatar-preview{height:145px;width:120px;margin-bottom:18px}
+@media(max-width:600px){.career-ui .avatar-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.career-ui .avatar-choice{max-height:130px}.career-ui .avatar-preview{height:130px;width:108px}.career-ui #create .wizard-step{padding:4px 0}.career-ui #create .wizard-step>.screen-intro{margin:8px 0 18px}}

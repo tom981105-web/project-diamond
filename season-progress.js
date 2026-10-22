@@ -8,7 +8,7 @@
  function shell(){
   if($('seasonProgressDialog'))return;
   const dialog=document.createElement('dialog');dialog.id='seasonProgressDialog';dialog.className='career-dialog season-progress-dialog';dialog.setAttribute('aria-labelledby','seasonProgressTitle');
-  dialog.innerHTML='<p class="page-eyebrow">나의 시즌</p><h2 id="seasonProgressTitle">시즌 진행</h2><p id="seasonProgressPhase" role="status" aria-live="polite"></p><progress id="seasonRunProgress" max="144" value="0" aria-label="완료한 팀 경기"></progress><div class="progress-label"><span id="seasonRunCount"></span><span id="seasonRunPercent"></span></div><div class="run-body25"><section aria-labelledby="seasonLandmarksTitle25"><h3 id="seasonLandmarksTitle25">쌓여 가는 기록</h3><ol id="seasonLandmarks25"></ol></section><details id="seasonRunDetails25"><summary>현재 기록과 최근 경기</summary><div id="seasonRunStats" class="decision-rows"></div><div id="seasonRunMoments"></div></details></div><p class="decision-note">완료한 팀 경기와 실제 선수 기록을 표시합니다. 중요한 선택이 생기면 일정을 멈춥니다.</p><div class="decision-actions"><button type="button" class="secondary" id="stopSeasonRun">여기서 멈추기</button><button type="button" id="skipSeasonAnimation">연출 건너뛰기</button></div>';
+  dialog.innerHTML='<p class="page-eyebrow">나의 시즌</p><h2 id="seasonProgressTitle">시즌 진행</h2><p id="seasonProgressPhase" role="status" aria-live="polite"></p><progress id="seasonRunProgress" max="144" value="0" aria-label="완료한 팀 경기"></progress><div class="progress-label"><span id="seasonRunCount"></span><span id="seasonRunPercent"></span></div><div class="run-body25"><div id="runPlayerScene27"></div><section aria-labelledby="seasonLandmarksTitle25"><h3 id="seasonLandmarksTitle25">쌓여 가는 기록</h3><ol id="seasonLandmarks25"></ol></section><details id="seasonRunDetails25"><summary>현재 기록과 최근 경기</summary><div id="seasonRunStats" class="decision-rows"></div><div id="seasonRunMoments"></div></details></div><p class="decision-note">완료한 팀 경기와 실제 선수 기록을 표시합니다. 중요한 선택이 생기면 일정을 멈춥니다.</p><div class="decision-actions"><button type="button" class="secondary" id="stopSeasonRun">여기서 멈추기</button><button type="button" id="skipSeasonAnimation">연출 건너뛰기</button></div>';
   document.querySelector('main').append(dialog);
   $('stopSeasonRun').onclick=()=>stop(true);
   dialog.oncancel=e=>{e.preventDefault();stop(true);};
@@ -29,6 +29,7 @@
   $('seasonRunProgress').value=g;$('seasonRunCount').textContent=g+' / 144팀 경기';$('seasonRunPercent').textContent=Math.round(g/144*100)+'%';
   const row=(label,value)=>'<div class="decision-row"><span>'+label+'</span><strong>'+escapeHtml(String(value))+'</strong></div>';
   $('seasonRunStats').innerHTML=row(bat?'타율 · 홈런':'평균자책점 · 탈삼진',bat?s.AVG+' · '+state.current.HR+'홈런':s.ERA+' · '+state.current.PK+'K')+row('종합 능력',overall())+row('컨디션 · 피로',Math.round(d.condition)+' · '+Math.round(d.fatigue))+row('소속 단계',d.level);
+  $('runPlayerScene27').innerHTML=window.DiamondScenes27?.progress()||'';
   landmarks();
   $('seasonRunMoments').innerHTML=r.moments.slice(-3).reverse().map(m=>'<div class="run-moment"><span>'+m.game+'팀 경기</span><strong>'+escapeHtml(m.text)+'</strong></div>').join('');
  }

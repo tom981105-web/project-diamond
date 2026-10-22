@@ -55,6 +55,7 @@
   $('playerPortrait').innerHTML=portrait(Number(u.avatar)||0)+'<span class="ovr-badge"><small>OVR</small>'+overall()+'</span>';
   const total=totals(),r=statline(total,state.role),entries=state.role==='batter'?[['프로 출장',total.G],['통산 안타',total.H],['통산 홈런',total.HR]]:[['프로 출장',total.G],['통산 탈삼진',total.PK],['통산 승리',total.W]];
   $('homeStats').innerHTML=entries.map(([k,v])=>'<div class="quick-stat"><span>'+k+'</span><strong>'+v+'</strong></div>').join('');
+  $('headline').textContent=college()?'대학 실전 '+c.results.length+' / 36경기':$('headline').textContent;
   $('journeyAction').textContent=state.retired?'새로운 커리어 준비':college()?(c.yearIndex>=3?'첫 프로 계약 선택':'대학 시즌 이어가기'):state.game===144?(u.reviewed?.[state.year]?'다음 시즌의 진로 결정':'이번 시즌 돌아보기'):'이번 시즌 시작하기';
   $('journeyTodo').innerHTML='<h3>'+(state.retired?'기록은 여기 남습니다':college()?(c.yearIndex>=3?'첫 유니폼을 고를 시간':'프로를 향한 준비'):state.game===144?'다음 시즌의 나는 어떤 선수일까요?':d.injury?'복귀를 위한 시간이 필요합니다':'다가올 기회를 준비하세요')+'</h3><p>'+(state.retired?'시즌별 기록과 수상, 이적의 발자취를 확인하세요.':college()?'대학 실전 성적이 스카우트 평가와 첫 입단 제안에 반영됩니다.':d.injury?'남은 재활 '+d.injury+'경기. 결장 기간에도 팀 일정은 진행됩니다.':state.game===144?'시즌 결산을 확인하고 육성 방향과 계약을 결정하세요.':'컨디션 '+Math.round(d.condition||0)+' · 피로 '+Math.round(d.fatigue||0)+' · '+(d.level||'1군'))+'</p><button type="button" id="todoLink">'+(state.retired?'커리어 기록 보기 →':'선수 상태 살펴보기 →')+'</button>';
   $('todoLink').onclick=()=>nav().show(state.retired?'career':'training');
@@ -138,7 +139,7 @@
    $('secondaryFocusSelect').onchange=e=>{const n=Number(e.target.value);dev.secondaryFocus=n>=0&&n!==dev.focus?n:null;save();layout();};
    $('focusSelect').onchange=e=>{dev.focus=Number(e.target.value);dev.secondaryFocus=null;save();layout();};
    if(college())for(const p of $('developmentPane').querySelectorAll('p'))if(p.textContent.includes('연봉'))p.textContent='대학 선수 · 프로 계약 전 · 대학 경기에서 성장 기회를 쌓습니다.';
-   $('growthMessage').textContent='종합 '+overall()+' · 잠재력 '+state.potential+' · 프로 12경기, 대학 4경기마다 훈련 기회';
+   $('growthMessage').textContent=college()?'종합 '+overall()+' · 대학 4경기마다 선택 과제 성장':'종합 '+overall()+' · 실제 훈련과 프로 출장·이닝을 구분해 성장합니다.';
    recordPage.append($('journeyChoices'));
    for(const [node,mode] of [[$('historyBody').closest('.panel'),'seasons'],[$('v4Pane'),'honors'],[$('v6Pane'),'honors'],[$('diamondAmateurHistory'),'amateur'],[$('diamondScouting'),'amateur'],[$('journeyChoices'),'amateur']])if(node)node.hidden=recordMode!==mode;
    for(const b of $('recordFilters').querySelectorAll('button')){b.classList.toggle('selected',b.dataset.recordMode===recordMode);b.setAttribute('aria-pressed',String(b.dataset.recordMode===recordMode));}

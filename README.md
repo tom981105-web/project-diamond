@@ -1,3 +1,7 @@
+# PROJECT DIAMOND V2.7
+
+실제 훈련·휴식·부상·기용 기록에 맞춘 선수 준비 장면을 추가했습니다. [표시 기준과 저장 보호](docs/PLAYER-SCENES-V2.7.md)를 확인하세요.
+
 # PROJECT DIAMOND V2.6
 
 대화의 선수·선택지와 선택 후 실제 결과를 연결하고, 기록된 효과를 다시 읽는 화면을 추가했습니다. [동작과 저장 보호](docs/CONVERSATION-FEEDBACK-V2.6.md)를 확인하세요.

@@ -28,3 +28,12 @@ test('avatar preview selection and failed optional art keep the generated player
 test('college profile and home shortcuts retain amateur separation',async({page})=>{
  await create(page,'batter',true);const before=await read(page);await page.getByRole('button',{name:'선수 정보',exact:true}).click();await expect(page.locator('#playerIdentity')).toContainText('대학 야구');await expect(page.locator('#playerIdentity')).toContainText('대학 야구부');await page.click('[data-tab=dashboard]');await page.getByRole('button',{name:'시즌 기록',exact:true}).click();await expect(page.locator('#archiveCount')).toHaveText('0시즌');expect(await read(page)).toEqual(before);
 });
+
+test('supplied first scene preserves its full aspect ratio and missing stages keep their fallback',async({page})=>{
+ await page.setViewportSize({width:390,height:844});await page.goto('./');const scene=page.locator('#landingJourney img');await expect(scene).toBeVisible();await expect.poll(()=>scene.evaluate(e=>e.complete&&e.naturalWidth>0)).toBe(true);const box=await page.locator('.journey-placeholder').boundingBox();expect(box.width/box.height).toBeCloseTo(16/9,1);expect(await scene.evaluate(e=>getComputedStyle(e).objectFit)).toBe('contain');
+ await page.getByRole('button',{name:'프로 데뷔',exact:true}).click();await expect(page.locator('#landingJourney img')).toHaveCount(0);await expect(page.locator('.journey-ball')).toBeVisible();await page.getByRole('button',{name:'첫 유니폼',exact:true}).click();await expect(page.locator('#landingJourney img')).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+test('supplied first avatar loads in choice, preview, home, player and reload without replacing saved choice',async({page})=>{
+ await page.goto('./');await page.click('#startJourney');const selected=page.locator('[data-avatar="0"] img');await expect(selected).toBeVisible();await expect.poll(()=>selected.evaluate(e=>e.complete&&e.naturalWidth>0)).toBe(true);await expect(page.locator('#avatarPreview img')).toBeVisible();
+ for(let i=0;i<3;i++)await page.click('#wizardNext');await page.click('button[type=submit]');const before=await read(page);expect(before.ui13.avatar).toBe(0);await expect(page.locator('#playerPortrait img')).toBeVisible();await page.click('[data-tab=training]');await expect(page.locator('#playerIdentity img')).toBeVisible();await page.reload();await expect(page.locator('#playerIdentity img')).toBeVisible();expect(await read(page)).toEqual(before);
+});

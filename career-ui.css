@@ -92,3 +92,10 @@ body.career-ui{background:#f3f4f6;color:var(--ink);font-size:14px;letter-spacing
 @media(prefers-reduced-motion:reduce){.career-ui *{scroll-behavior:auto!important}}
 
 .journey-stage-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.career-ui [hidden]{display:none!important}
+
+/* V1.10.1: preserve the supplied scene and transparent avatar in every entry point. */
+.career-ui .avatar-choice{position:relative;overflow:hidden}
+.career-ui .avatar-choice .career-portrait-image{inset:6px;width:calc(100% - 12px);height:calc(100% - 12px)}
+.career-ui .journey-placeholder.has-scene{height:auto;aspect-ratio:16/9;background:#edf2f8}
+.career-ui .has-scene .journey-stage-image{object-fit:contain}
+.career-ui .timeline-review{display:block}

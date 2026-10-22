@@ -1,3 +1,7 @@
+# PROJECT DIAMOND V1.5
+
+계약 기간·연봉/역할 협상·선수 평가에 따른 제안을 연결했습니다. [계산과 범위](docs/CONTRACTS-V1.5.md)를 확인하세요.
+
 # PROJECT DIAMOND V1.4
 
 출전 경쟁·7팀 경기 계획·중간 커리어 선택을 추가했습니다. [계산과 범위](docs/DEVELOPMENT-V1.4.md)를 확인하세요.

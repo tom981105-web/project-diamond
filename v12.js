@@ -84,6 +84,7 @@
    const outs=rows.reduce((a,x)=>a+x.IPouts,0),er=rows.reduce((a,x)=>a+x.ER,0);
    return {year,stage:'대학 '+(year-2025)+'학년',games:rows.length,era:(er*27/Math.max(1,outs)).toFixed(2),strikeouts:rows.reduce((a,x)=>a+x.PK,0),wins:rows.reduce((a,x)=>a+x.W,0),evaluation:'실전'};
   })};
+  if(window.DiamondContracts)window.DiamondContracts.rookie('college');
   if(typeof v5Teams==='function')v5Teams('KR');
   if(typeof ensureLeague==='function')ensureLeague();
   state.events.unshift(offer.team+' 입단 계약! '+offer.round+'라운드 · 계약 연봉 '+offer.salary.toLocaleString()+'만원');

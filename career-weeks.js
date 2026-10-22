@@ -26,8 +26,9 @@
   let form=0,summary='최근 출전 표본을 쌓는 중';
   if(state.role==='batter'&&total('AB')>=12){const avg=total('H')/total('AB');form=clamp((avg-.25)*55,-8,8);summary='최근 '+rows.length+'팀 경기 타율 '+avg.toFixed(3);}
   if(state.role==='pitcher'&&total('IPouts')>=9){const era=total('ER')*27/total('IPouts');form=clamp((4.3-era)*2,-8,8);summary='최근 '+rows.length+'팀 경기 ERA '+era.toFixed(2);}
-  const score=clamp(overall()*.45+d.trust*.35+d.condition*.2-d.fatigue*.15+form,0,100);
-  return {score:Math.round(score*10)/10,form,summary};
+  const contractAdjustment=window.DiamondContracts?.selectionAdjustment()||0;
+  const score=clamp(overall()*.45+d.trust*.35+d.condition*.2-d.fatigue*.15+form+contractAdjustment,0,100);
+  return {score:Math.round(score*10)/10,form,summary,contractAdjustment};
  }
  function factor(){const d=state.development;return clamp(1+(d.condition-85)*.0015-d.fatigue*.001,.75,1.025);}
  function planNow(){
@@ -172,7 +173,7 @@
   if(!root.hidden){$('seasonBtn').textContent='중요한 선택까지 시즌 진행';$('weekBtn').textContent='7경기 진행';}
   const coach=node('coachPanel',$('screen-training'));$('attributes').closest('.panel').before(coach);coach.hidden=false;
   const rate=state.role==='batter'?'주전이면 약 82–98%, 경쟁 중이면 평가에 따라 28–68%의 경기 기용 기회':'기용 평가 후 선발은 5팀 경기 간격, 구원은 경기 상황별 기존 등판 판정';
-  coach.innerHTML='<p class="page-eyebrow">COACH REPORT</p><h2>'+escapeHtml(status)+'</h2><p>'+escapeHtml(e.summary)+'</p><div class="report-rows"><div class="report-row"><span>현재 기용 평가</span><b>'+e.score+' / 100</b></div><div class="report-row"><span>기량 · 구단 신뢰</span><b>'+overall()+' · '+d.trust+'</b></div><div class="report-row"><span>컨디션 · 피로</span><b>'+Math.round(d.condition)+' · '+Math.round(d.fatigue)+'</b></div><div class="report-row"><span>경기 능력 적용</span><b>'+Math.round(factor()*100)+'%</b></div></div><p class="screen-intro">'+rate+'. 기용 평가는 7팀 경기마다 갱신합니다. 경쟁 우위 진입 62, 유지 54 이상. 2군은 신뢰 48·컨디션 45 이상에서 복귀합니다.</p><p class="coach-advice">'+(d.injury?'재활을 마치기 전에는 공식 경기에 출전할 수 없습니다.':d.level==='2군'?'2군 훈련으로 매주 신뢰를 회복하세요. 프로 누적 성적으로 복귀를 막지 않습니다.':d.fatigue>60||d.condition<45?'피로를 낮추고 컨디션을 회복하면 기용 평가와 경기 능력이 함께 개선됩니다.':e.form<0?'최근 부진이 평가에 반영되고 있습니다. 선택한 과제를 훈련하고 다음 기회를 준비하세요.':'기량과 신뢰를 쌓아 기용 평가 62를 목표로 하세요.')+'</p>';
+  coach.innerHTML='<p class="page-eyebrow">COACH REPORT</p><h2>'+escapeHtml(status)+'</h2><p>'+escapeHtml(e.summary)+'</p><div class="report-rows"><div class="report-row"><span>현재 기용 평가</span><b>'+e.score+' / 100</b></div><div class="report-row"><span>기량 · 구단 신뢰</span><b>'+overall()+' · '+d.trust+'</b></div><div class="report-row"><span>컨디션 · 피로</span><b>'+Math.round(d.condition)+' · '+Math.round(d.fatigue)+'</b></div><div class="report-row"><span>경기 능력 적용</span><b>'+Math.round(factor()*100)+'%</b></div></div><p class="screen-intro">계약 역할·리그 적응 보정 '+e.contractAdjustment.toFixed(1)+'점 · 시즌 초 42팀 경기에 걸쳐 사라집니다.</p><p class="screen-intro">'+rate+'. 기용 평가는 7팀 경기마다 갱신합니다. 경쟁 우위 진입 62, 유지 54 이상. 2군은 신뢰 48·컨디션 45 이상에서 복귀합니다.</p><p class="coach-advice">'+(d.injury?'재활을 마치기 전에는 공식 경기에 출전할 수 없습니다.':d.level==='2군'?'2군 훈련으로 매주 신뢰를 회복하세요. 프로 누적 성적으로 복귀를 막지 않습니다.':d.fatigue>60||d.condition<45?'피로를 낮추고 컨디션을 회복하면 기용 평가와 경기 능력이 함께 개선됩니다.':e.form<0?'최근 부진이 평가에 반영되고 있습니다. 선택한 과제를 훈련하고 다음 기회를 준비하세요.':'기량과 신뢰를 쌓아 기용 평가 62를 목표로 하세요.')+'</p>';
   const history=node('developmentHistory',$('screen-training'));history.hidden=false;
   const gains=c.growth.filter(x=>x.year===state.year),sum=source=>gains.filter(x=>x.source===source).reduce((n,x)=>n+x.amount,0);
   history.innerHTML='<h3>이번 시즌 성장 내역</h3><p>훈련 +'+sum('훈련 성장')+' · 실전 경험 +'+sum('실전 경험')+' <span class="screen-intro">(능력 합계)</span></p><p class="screen-intro">훈련은 12팀 경기 구간 중 실제 훈련 6일 이상일 때 지급합니다. 강훈련 6일 이상이면 +2, 그 외 +1. 실전 경험은 타자 24출장·투수 24이닝마다 +1입니다. 잠재력 상한과 32세 이하 조건을 적용합니다.</p>'+gains.slice(-8).reverse().map(x=>'<div class="growth-row">'+x.game+'경기 · '+x.source+' · '+escapeHtml(ATTR[state.role][x.index])+' +'+x.amount+'</div>').join('');

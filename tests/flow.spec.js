@@ -5,7 +5,7 @@ async function create(page,college=false){await page.goto('./');await page.click
 test('home tasks open the current chapter and training without progressing a saved career',async({page})=>{
  await create(page);const before=await read(page);await expect(page.locator('#homeRating')).toContainText('종합 능력치');await expect(page.locator('#journeyTodo')).toContainText('확인할 일');
  await page.click('#homeTrainingTask');await expect(page.locator('header h1')).toHaveText('선수');await page.click('[data-tab=dashboard]');await page.click('#homeCareerTask');await expect(page.locator('#seasonStory')).toHaveAttribute('data-phase','season');expect(await read(page)).toEqual(before);
- await page.reload();expect(await read(page)).toEqual(before);await expect(page.locator('#seasonStory')).toContainText('새로운 시즌');
+ await page.reload();expect(await read(page)).toEqual(before);await expect(page.locator('#seasonPrimaryMetric')).toHaveText('—');await expect(page.locator('#seasonStory')).toContainText('개막 준비');
 });
 test('home review task leads through direction, feedback, contract inspection and one final application',async({page})=>{
  await create(page);await page.click('#homeCareerTask');await finishSeason(page);await page.click('#dismissReview');await page.click('[data-tab=dashboard]');await expect(page.locator('#homeCareerTask')).toContainText('이번 시즌을 돌아볼 시간');await page.click('#homeCareerTask');await expect(page.locator('#journeyReview')).toBeVisible();await page.click('#confirmReview');await expect(page.locator('#seasonStory')).toHaveAttribute('data-phase','direction');

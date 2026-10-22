@@ -33,5 +33,5 @@ test('sacrifice fly needs a runner on third and fewer than two outs; loaded walk
 
 test('release scripts use one cache version',async({page})=>{
   const scripts=await page.locator('script[src]').evaluateAll(nodes=>nodes.map(n=>new URL(n.src).searchParams.get('v')));
-  expect(scripts.length).toBeGreaterThan(10);expect(new Set(scripts)).toEqual(new Set(['3.0']));
+  expect(scripts.length).toBeGreaterThan(10);expect(new Set(scripts)).toEqual(new Set(['3.1']));
 });

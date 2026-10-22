@@ -31,8 +31,8 @@
   const firstHit=state.role==='batter'&&record.stats?.H>0&&!state.career.some(r=>r.year<record.year&&r.stats?.H>0);
   section.innerHTML=(firstHit?'<details class="first-hit-story"><summary>프로 첫 안타를 기록한 시즌</summary>'+img(2,'프로 첫 안타의 순간')+'</details>':'')+(champion?'<div class="season-celebration">'+img(3,'동료들과 함께한 우승')+'<h2>함께 만든 우승의 순간</h2></div>':'')+'<h2>시즌의 순간</h2>'+(moments(record)||'<p class="screen-intro">이 시즌에 보관된 생활 선택이 없습니다.</p>')+'<h2>언론과 팬의 반응</h2>'+reactions(record);
  }
- function review(){if(state&&$('reviewContent')){report(current(),$('reviewContent'));window.DiamondChapters24?.review();}}
- function archive(record,target){report(record,target);const match=record.review19?.match20;if(match){const b=document.createElement('button');b.type='button';b.className='secondary replay-archive';b.textContent='이 시즌 마지막 경기 다시보기';b.onclick=()=>openReplay(match);target.append(b);}}
+ function review(){if(state&&$('reviewContent')){report(current(),$('reviewContent'));window.DiamondChapters24?.review();window.DiamondRecap30?.live($('reviewContent'));}}
+ function archive(record,target){report(record,target);const match=record.review19?.match20;if(match){const b=document.createElement('button');b.type='button';b.className='secondary replay-archive';b.textContent='이 시즌 마지막 경기 다시보기';b.onclick=()=>openReplay(match);target.append(b);}window.DiamondRecap30?.archive(record,target);}
  function feed(){
   const root=$('journeyArticles');if(!root)return;
   const records=[...state.career].slice(-3).reverse();

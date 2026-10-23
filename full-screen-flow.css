@@ -117,3 +117,4 @@
  .replay-preview36>small {margin:0; text-align:center}
 }
 @media(max-height:700px) {.replay-preview36>.replay-face36 {height:66px; width:52px}.replay-preview36 {padding:14px 18px}}
+.career-ui .replay-preview36>button.secondary {background:white; color:#536f94; border:1px solid #e6ebf2}

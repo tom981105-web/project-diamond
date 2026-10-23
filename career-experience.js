@@ -5,7 +5,7 @@
  const text=v=>escapeHtml(String(v??'')),list=v=>Array.isArray(v)?v:[],money=v=>(Number(v)||0).toLocaleString()+'만원';
  const school=()=>!!(state?.v12?.college&&!state.v12.college.completed);
  const card=(id,parent,cls='surface-card')=>{let e=$(id);if(!e){e=document.createElement('section');e.id=id;e.className=cls;parent.append(e);}return e;};
- let owner=null,filters={level:'pro',team:'all',year:'all'},replay=null,painting=false;
+ let owner=null,filters={level:'pro',team:'all',year:'all'},replay=null,replayTimer=null,painting=false;
  const fact=record=>{const s=record.stats||empty(),rate=statline(s,state.role);return state.role==='batter'?s.G+'출장 · '+s.H+'안타 · '+s.HR+'홈런 · 타율 '+(s.AB?rate.AVG:'—'):s.G+'등판 · '+s.W+'승 · '+s.PK+'탈삼진 · ERA '+(s.IPouts?rate.ERA:'—');};
  const latest=()=>state?.career?.at(-1);
  const current=()=>({year:state.year,team:state.team,stats:state.current,ovr:overall()});
@@ -56,7 +56,7 @@
  function shell(){
   if($('lifeMomentDialog'))return;
   for(const [id,title] of [['lifeMomentDialog','선수 생활의 선택'],['careerShopDialog','나를 위한 투자'],['matchReplayDialog','경기 다시보기'],['careerSceneDialog','커리어의 한 장면']]){
-   const d=document.createElement('dialog');d.id=id;d.className='career-dialog experience-dialog';d.setAttribute('aria-labelledby',id+'Title');d.innerHTML='<div class="dialog-top"><h2 id="'+id+'Title">'+title+'</h2><button type="button" data-experience-close aria-label="'+title+' 닫기">닫기</button></div><div class="experience-body"></div>';document.querySelector('main').append(d);d.querySelector('[data-experience-close]').onclick=()=>d.close();
+   const d=document.createElement('dialog');d.id=id;d.className='career-dialog experience-dialog';d.setAttribute('aria-labelledby',id+'Title');d.innerHTML='<div class="dialog-top"><h2 id="'+id+'Title">'+title+'</h2><button type="button" data-experience-close aria-label="'+title+' 닫기">닫기</button></div><div class="experience-body"></div>';document.querySelector('main').append(d);d.querySelector('[data-experience-close]').onclick=()=>d.close();if(id==='matchReplayDialog'){d.addEventListener('close',pauseReplay);d.addEventListener('cancel',pauseReplay);}
   }
  }
  function openLife(){
@@ -98,42 +98,74 @@
   const best=state.career.reduce((best,r)=>(r.ovr||0)>(best?.ovr||0)?r:best,null);
   root.innerHTML=img(4,'선수 생활을 마치고 구장을 바라보는 순간')+'<p class="flow-eyebrow">나의 야구 인생</p><h2>'+text(state.name)+'의 마지막 유니폼</h2><p>'+state.career.length+'시즌 · '+state.age+'세 은퇴 · '+(state.role==='batter'?total.H+'안타 · '+total.HR+'홈런':total.W+'승 · '+total.PK+'탈삼진')+'</p>'+(best?'<p>가장 높은 종합 능력 '+best.ovr+' · '+best.year+'년</p>':'')+'<p class="screen-intro">시즌 기록과 계약, 선택의 발자취를 보관했습니다.</p><button type="button" id="retirementRecords">나의 커리어 돌아보기</button>';$('retirementRecords').onclick=()=>window.DiamondNavigation.show('career');
  }
- function openReplay(match){
-  if(!match)return;shell();replay={owner:state,match,index:0};paintReplay();$('matchReplayDialog').showModal();
+ function pauseReplay(){clearTimeout(replayTimer);replayTimer=null;if(replay)replay.auto=false;const b=$('replayAuto36');if(b){b.textContent='자동 재생';b.setAttribute('aria-pressed','false');}}
+ function scheduleReplay(){
+  clearTimeout(replayTimer);const r=replay;
+  if(!r?.auto)return;
+  replayTimer=setTimeout(()=>{
+   if(replay!==r||state!==r.owner||state.year!==r.year||!$('matchReplayDialog').open||document.visibilityState==='hidden'){pauseReplay();return;}
+   r.index++;paintReplay();if(r.auto)scheduleReplay();
+  },r.delay);
  }
+ function openReplay(match){
+  if(!match||!state)return;pauseReplay();shell();replay={owner:state,year:state.year,match,index:0,phase:list(match.frames).some(f=>list(f.plays).length)?'preview':'result',auto:false,delay:700};paintReplay();$('matchReplayDialog').showModal();
+ }
+ document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')pauseReplay();});
+ window.addEventListener('pagehide',pauseReplay);
+
  function paintReplay(){
-  if(!replay||replay.owner!==state){$('matchReplayDialog').close();return;}
+  if(!replay||replay.owner!==state||replay.year!==state.year){pauseReplay();$('matchReplayDialog').close();return;}
+  const scrollBody=$('matchReplayDialog').querySelector('.experience-body'),keepScroll=replay.auto&&$('matchReplayDialog').dataset.phase==='play',scrollTop=scrollBody.scrollTop;
+  const focused=$('matchReplayDialog').contains(document.activeElement)?document.activeElement.id:null;
   const r=replay,m=r.match,frames=list(m.frames),plays=frames.flatMap(f=>list(f.plays).map(p=>({...p,inning:f.inning}))),p=plays[r.index],end=r.index>=plays.length;
-  const seen=plays.slice(0,end?plays.length:r.index+1),names={'1B':'안타','2B':'2루타','3B':'3루타',HR:'홈런',BB:'볼넷',SO:'삼진',OUT:'범타',SF:'희생타'};
+  if(end){r.phase='result';pauseReplay();}
+  const preview=r.phase==='preview';$('matchReplayDialog').dataset.phase=r.phase;
+  const seen=preview?[]:plays.slice(0,end?plays.length:r.index+1),names={'1B':'안타','2B':'2루타','3B':'3루타',HR:'홈런',BB:'볼넷',SO:'삼진',OUT:'범타',SF:'희생타'};
   const inningRuns=(inning,half)=>seen.filter(q=>q.inning===inning&&q.half===half).reduce((n,q)=>n+(q.runs||0),0);
-  const score=half=>end?(half==='초'?m.awayRuns:m.homeRuns):frames.filter(f=>f.inning<p.inning).reduce((n,f)=>n+(f[half==='초'?'away':'home']||0),0)+inningRuns(p.inning,half);
+  const score=half=>preview?0:end?(half==='초'?m.awayRuns:m.homeRuns):frames.filter(f=>f.inning<p.inning).reduce((n,f)=>n+(f[half==='초'?'away':'home']||0),0)+inningRuns(p.inning,half);
   const call=q=>text(q.name)+' · '+text(names[q.kind]||q.kind)+(q.runs?' · '+q.runs+'득점':'')+(q.user?' · 내 타석':q.pitchUser?' · 내 투구':'')+' · '+q.outs+'아웃';
+  const portrait=window.DiamondVisualAssets?.portraits?.[Number(state.ui13?.avatar)||0],face=portrait?'<img class="replay-face36" src="'+text(portrait)+'" alt="내 선수 모습">':'';
   const nextMine=plays.findIndex((q,i)=>i>r.index&&(q.user||q.pitchUser));
-  const line=(f,key)=>end||f.inning<p.inning?f[key]===null?'X':f[key]:f.inning>p.inning||key==='home'&&p.half==='초'?'—':inningRuns(f.inning,key==='away'?'초':'말');
+  const line=(f,key)=>preview?'—':end||f.inning<p.inning?f[key]===null?'X':f[key]:f.inning>p.inning||key==='home'&&p.half==='초'?'—':inningRuns(f.inning,key==='away'?'초':'말');
   const mine=seen.filter(q=>q.user||q.pitchUser),metrics=state.role==='batter'?[['타석',mine.filter(q=>q.user).length],['안타',mine.filter(q=>q.user&&['1B','2B','3B','HR'].includes(q.kind)).length],['홈런',mine.filter(q=>q.user&&q.kind==='HR').length]]:[['상대한 타석',mine.filter(q=>q.pitchUser).length],['탈삼진',mine.filter(q=>q.pitchUser&&q.kind==='SO').length],['볼넷',mine.filter(q=>q.pitchUser&&q.kind==='BB').length]];
   $('matchReplayDialog').querySelector(':scope > .decision-actions')?.remove();
   $('matchReplayDialog').querySelector('.experience-body').innerHTML=
-   '<div class="replay-status35"><span>저장된 경기</span><strong>'+(end?'경기 종료':p.inning+'회 '+p.half)+'</strong><span>'+(end?plays.length:r.index+1)+' / '+plays.length+'타석</span></div>'+
+   '<section class="replay-intro36" '+(!preview?'hidden':'')+'><p class="flow-eyebrow">기록으로 돌아가는 그라운드</p><h2>이 경기를<br>함께 돌아볼까요?</h2><p>타석별 흐름을 따라가거나 내 '+(state.role==='batter'?'타석':'투구')+' 장면으로 이동할 수 있습니다.</p></section>'+
+   '<div class="replay-status35"><span>저장된 경기</span><strong>'+(preview?'경기 준비':end?'경기 종료':p.inning+'회 '+p.half)+'</strong><span>'+(preview?0:end?plays.length:r.index+1)+' / '+plays.length+'타석</span></div>'+
    '<div class="baseball-score"><span>'+text(m.away)+'</span><strong>'+score('초')+' : '+score('말')+'</strong><span>'+text(m.home)+'</span></div>'+
-   '<progress id="replayProgress35" max="'+Math.max(1,plays.length)+'" value="'+(end?plays.length:r.index+1)+'" aria-label="경기 다시보기 진행"></progress>'+
-   '<div class="replay-field"><svg viewBox="0 0 600 300" role="img" aria-label="'+(end?'경기 종료':p.outs+'아웃 · 주자 '+p.bases.filter(Boolean).length+'명')+'"><defs><pattern id="replayGrass35" width="80" height="300" patternUnits="userSpaceOnUse"><rect width="40" height="300" fill="#e3f1e9"/><rect x="40" width="40" height="300" fill="#e9f5ee"/></pattern></defs><rect width="600" height="300" rx="18" fill="url(#replayGrass35)"/><path d="M300 269 90 60Q300-36 510 60Z" fill="none" stroke="white" stroke-width="2"/><path d="m300 269-91-91 91-91 91 91Z" fill="#e6d4b5"/><path d="M300 269 90 60M300 269 510 60" stroke="white" stroke-width="2"/>'+[[209,178],[300,87],[391,178]].map(([x,y],i)=>'<rect x="'+(x-7)+'" y="'+(y-7)+'" width="14" height="14" transform="rotate(45 '+x+' '+y+')" fill="'+(!end&&p.bases[2-i]?'#3478eb':'white')+'"/>').join('')+'<circle cx="300" cy="181" r="7" fill="#b89871"/><path d="m294 264 6-4 6 4v7h-12Z" fill="white"/></svg></div>'+
-   '<p class="replay-call" role="status">'+(end?'기록된 최종 결과입니다.':call(p))+'</p>'+
-   '<div class="replay-personal35" aria-label="재생한 구간의 내 기록">'+metrics.map(([label,value])=>'<div><small>'+label+'</small><strong>'+value+'</strong></div>').join('')+'</div>'+
-   '<ol class="replay-feed35" aria-label="최근 타석 중계">'+seen.slice(-4).reverse().map(q=>'<li class="'+(q.user||q.pitchUser?'is-mine':'')+'"><span>'+q.inning+'회 '+q.half+'</span><p>'+call(q)+'</p></li>').join('')+'</ol>'+
-   '<details class="replay-lines35"><summary>이닝별 점수 보기</summary><div class="tablewrap"><table><thead><tr><th>팀</th>'+frames.map(f=>'<th>'+f.inning+'</th>').join('')+'<th>R</th></tr></thead><tbody>'+[['away',m.away],['home',m.home]].map(([key,name])=>'<tr><td>'+text(name)+'</td>'+frames.map(f=>'<td>'+line(f,key)+'</td>').join('')+'<td>'+score(key==='away'?'초':'말')+'</td></tr>').join('')+'</tbody></table></div></details>'+
+   '<progress id="replayProgress35" max="'+Math.max(1,plays.length)+'" value="'+(preview?0:end?plays.length:r.index+1)+'" aria-label="경기 다시보기 진행"></progress>'+
+   '<div class="replay-field" '+(preview?'hidden':'')+'><svg viewBox="0 0 600 300" role="img" aria-label="'+(end?'경기 종료':p.outs+'아웃 · 주자 '+p.bases.filter(Boolean).length+'명')+'"><defs><pattern id="replayGrass35" width="80" height="300" patternUnits="userSpaceOnUse"><rect width="40" height="300" fill="#e3f1e9"/><rect x="40" width="40" height="300" fill="#e9f5ee"/></pattern></defs><rect width="600" height="300" rx="18" fill="url(#replayGrass35)"/><path d="M300 269 90 60Q300-36 510 60Z" fill="none" stroke="white" stroke-width="2"/><path d="m300 269-91-91 91-91 91 91Z" fill="#e6d4b5"/><path d="M300 269 90 60M300 269 510 60" stroke="white" stroke-width="2"/>'+[[209,178],[300,87],[391,178]].map(([x,y],i)=>'<rect x="'+(x-7)+'" y="'+(y-7)+'" width="14" height="14" transform="rotate(45 '+x+' '+y+')" fill="'+(!end&&p.bases[2-i]?'#3478eb':'white')+'"/>').join('')+'<circle cx="300" cy="181" r="7" fill="#b89871"/><path d="m294 264 6-4 6 4v7h-12Z" fill="white"/></svg></div>'+
+   '<p class="replay-call" role="status">'+(preview?'자동 중계 또는 타석별 보기를 선택하세요.':end?'경기가 끝났습니다.':call(p))+'</p>'+
+   '<div class="replay-toolbar36" '+(preview||end?'hidden':'')+'><button type="button" id="replayAuto36" class="secondary" aria-pressed="'+r.auto+'">'+(r.auto?'일시정지':'자동 재생')+'</button><label>속도<select id="replaySpeed36"><option value="700" '+(r.delay===700?'selected':'')+'>1×</option><option value="350" '+(r.delay===350?'selected':'')+'>2×</option><option value="175" '+(r.delay===175?'selected':'')+'>4×</option></select></label></div>'+
+   (preview?'<div class="replay-preview36">'+face+'<p>'+text(state.name)+' · '+text(state.position)+'</p><button type="button" class="secondary" id="replayNext">타석별로 보기</button><small>저장된 경기 기록을 재생합니다.</small></div>':'')+
+   (end?'<section class="replay-result36" aria-label="이 경기의 나">'+face+'<div><strong>'+text(state.name)+'</strong><small>'+text(state.position)+' · '+(mine.length?'이 경기의 내 기록':'내 출장 장면 미보관')+'</small></div></section>':'')+
+   '<div class="replay-personal35" '+(preview?'hidden':'')+' aria-label="재생한 구간의 내 기록">'+metrics.map(([label,value])=>'<div><small>'+label+'</small><strong>'+value+'</strong></div>').join('')+'</div>'+
+   '<ol class="replay-feed35" '+(preview?'hidden':'')+' aria-label="최근 타석 중계">'+seen.slice(-4).reverse().map(q=>'<li class="'+(q.user||q.pitchUser?'is-mine':'')+'"><span>'+q.inning+'회 '+q.half+'</span><p>'+call(q)+'</p></li>').join('')+'</ol>'+
+   '<details class="replay-lines35" '+(preview?'hidden':'')+'><summary>이닝별 점수 보기</summary><div class="tablewrap"><table><thead><tr><th>팀</th>'+frames.map(f=>'<th>'+f.inning+'</th>').join('')+'<th>R</th></tr></thead><tbody>'+[['away',m.away],['home',m.home]].map(([key,name])=>'<tr><td>'+text(name)+'</td>'+frames.map(f=>'<td>'+line(f,key)+'</td>').join('')+'<td>'+score(key==='away'?'초':'말')+'</td></tr>').join('')+'</tbody></table></div></details>'+
+   (end&&plays.length&&!plays.some(q=>q.user||q.pitchUser)?'<p class="replay-absent36">이 경기에 보관된 내 출장 장면은 없습니다.</p>':'')+
    '<p class="fiction-note">'+(plays.length?'저장된 타석을 차례로 보여줍니다. 내 기록은 재생한 구간까지 집계합니다.':'이 경기에는 타석별 기록이 없습니다. 보관된 최종 점수만 표시합니다.')+'</p>'+
-   '<div class="replay-navigation35"><button type="button" class="secondary" id="replayPrevious35" '+(r.index===0||!plays.length?'disabled':'')+'>이전 타석</button><button type="button" class="secondary" id="replayMine35" '+(nextMine<0?'disabled':'')+'>내 '+(state.role==='batter'?'타석으로':'투구로')+'</button></div>'+
-   '<div class="decision-actions"><button type="button" class="secondary" id="replayFinish" '+(end?'disabled':'')+'>결과만 보기</button><button type="button" id="replayNext" '+(end?'disabled':'')+'>다음 타석</button></div>';
-  $('matchReplayDialog').append($('matchReplayDialog').querySelector('.experience-body > .decision-actions'));
-  $('matchReplayDialog').querySelector('.experience-body').scrollTop=0;
-  $('replayNext').onclick=()=>{r.index++;paintReplay();};$('replayFinish').onclick=()=>{r.index=plays.length;paintReplay();};
-  $('replayPrevious35').onclick=()=>{r.index=Math.max(0,r.index-1);paintReplay();};$('replayMine35').onclick=()=>{if(nextMine>=0){r.index=nextMine;paintReplay();}};
+   '<div class="replay-navigation35" '+(preview?'hidden':'')+'><button type="button" class="secondary" id="replayPrevious35" '+(r.index===0||!plays.length?'disabled':'')+'>이전 타석</button><button type="button" class="secondary" id="replayMine35" '+(nextMine<0?'disabled':'')+'>내 '+(state.role==='batter'?'타석으로':'투구로')+'</button></div>'+
+   '<div class="decision-actions">'+(end?'<button type="button" class="secondary" id="replayRestart36" '+(!plays.length?'disabled':'')+'>처음부터 보기</button><button type="button" id="replayExit36">돌아가기</button>':'')+'<button type="button" class="secondary" id="replayFinish" '+(end?'disabled hidden':'')+'>결과만 보기</button>'+(preview?'<button type="button" id="replayStart36">자동 중계 시작</button>':'<button type="button" id="replayNext" '+(end?'disabled hidden':'')+'>다음 타석</button>')+'</div>'+
+   (end&&m===state.league?.last&&state.game===144&&!school()?'<button type="button" class="secondary replay-review36" id="replayReview36">이번 시즌 결산 보기</button>':'');
+  const d=$('matchReplayDialog');d.append(d.querySelector('.experience-body > .decision-actions'));
+  d.querySelector('.experience-body').scrollTop=keepScroll?scrollTop:0;
+  const manual=action=>{pauseReplay();r.phase='play';action();paintReplay();};
+  $('replayNext').onclick=()=>manual(()=>{if(!preview)r.index++;});$('replayFinish').onclick=()=>manual(()=>{r.index=plays.length;});
+  $('replayPrevious35').onclick=()=>manual(()=>{r.index=Math.max(0,r.index-1);});$('replayMine35').onclick=()=>manual(()=>{if(nextMine>=0)r.index=nextMine;});
+  if($('replayStart36'))$('replayStart36').onclick=()=>{r.phase='play';r.auto=true;paintReplay();scheduleReplay();};
+  $('replayAuto36').onclick=()=>{if(r.auto)pauseReplay();else{r.auto=true;paintReplay();scheduleReplay();}};
+  $('replaySpeed36').onfocus=()=>{if(r.auto)pauseReplay();};
+  $('replaySpeed36').onchange=e=>{r.delay=Number(e.target.value);if(r.auto)scheduleReplay();};
+  if($('replayExit36'))$('replayExit36').onclick=()=>d.close();
+  if($('replayRestart36'))$('replayRestart36').onclick=()=>manual(()=>{r.index=0;});
+  if($('replayReview36'))$('replayReview36').onclick=()=>{d.close();window.DiamondUI.openReview();};
+  if(focused){const available=e=>e&&!e.disabled&&!e.closest('[hidden]');let target=$(focused);if(!available(target))target=r.auto?$('replayAuto36'):end?$('replayExit36'):null;if(available(target))target.focus({preventScroll:true});}
  }
  function matchCard(){
   const root=card('recentMatchStory',$('screen-league')),match=state.league?.last;root.hidden=school()||!match;if(root.hidden)return;
   root.innerHTML='<p class="flow-eyebrow">'+(state.game===144?'정규시즌 마지막 경기':'최근 경기')+'</p><h3>'+text(match.away)+' '+match.awayRuns+' : '+match.homeRuns+' '+text(match.home)+'</h3><button type="button" class="secondary" id="openMatchReplay">그라운드에서 다시보기</button>';$('openMatchReplay').onclick=()=>openReplay(match);
  }
- function paint(){if(painting)return;painting=true;try{shell();if(!state){for(const id of ['lifeMomentDialog','careerShopDialog','matchReplayDialog','careerSceneDialog'])$(id)?.close();return;}if(owner!==state){owner=state;filters={level:'pro',team:'all',year:'all'};replay=null;for(const id of ['lifeMomentDialog','careerShopDialog','matchReplayDialog','careerSceneDialog'])$(id)?.close();}if(!$('seasonStory'))return;feed();life();welcome();explorer();retirement();matchCard();if($('journeyReview')?.open)review();}finally{painting=false;}}
+ function paint(){if(painting)return;painting=true;try{shell();if(!state){for(const id of ['lifeMomentDialog','careerShopDialog','matchReplayDialog','careerSceneDialog'])$(id)?.close();return;}if(replay&&replay.year!==state.year){pauseReplay();$('matchReplayDialog').close();}if(owner!==state){pauseReplay();owner=state;filters={level:'pro',team:'all',year:'all'};replay=null;for(const id of ['lifeMomentDialog','careerShopDialog','matchReplayDialog','careerSceneDialog'])$(id)?.close();}if(!$('seasonStory'))return;feed();life();welcome();explorer();retirement();matchCard();if($('journeyReview')?.open)review();}finally{painting=false;}}
  window.DiamondExperience=Object.freeze({review,archive,welcome,openReplay});
  render=function(){baseRender();paint();};setup=function(){baseSetup();paint();};window.DiamondUI.layout=function(){baseLayout();paint();};
  window.addEventListener('diamond-slot-change',()=>{owner=null;paint();});

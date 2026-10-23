@@ -1,0 +1,120 @@
+/* V3.6: viewport-height career pages with a shared reading rhythm. */
+.career-ui :is(#matchReplayDialog,#journeyReview,#seasonArchiveDialog,#seasonProgressDialog) {
+ position:fixed; inset:0; margin:0 auto; width:min(800px,100%); max-width:800px;
+ height:100dvh; max-height:100dvh; border:0; border-radius:0; box-shadow:none;
+ padding:0 26px; background:#fff; color:#202833; box-sizing:border-box;
+}
+.career-ui :is(#matchReplayDialog,#journeyReview,#seasonArchiveDialog,#seasonProgressDialog)::backdrop {background:#f2f3f5; backdrop-filter:none}
+.career-ui :is(#matchReplayDialog,#journeyReview,#seasonArchiveDialog)[open] {display:flex; flex-direction:column; overflow:hidden; min-height:0}
+.career-ui :is(#matchReplayDialog,#journeyReview,#seasonArchiveDialog)>.dialog-top {
+ position:static; flex:0 0 68px; min-height:68px; margin:0; padding:0; border:0;
+ display:flex; align-items:center; justify-content:space-between; background:white;
+}
+.career-ui :is(#matchReplayDialog,#journeyReview,#seasonArchiveDialog)>.dialog-top :is(h2,.page-eyebrow) {margin:0; font-size:14px; font-weight:600; color:#4c607c; letter-spacing:0}
+.career-ui :is(#matchReplayDialog,#journeyReview,#seasonArchiveDialog)>.dialog-top>button {background:transparent; color:#718198; font-size:13px; min-height:44px; padding:8px 4px 8px 15px}
+.career-ui :is(#matchReplayDialog,#journeyReview,#seasonArchiveDialog)>.dialog-top>button::before {content:'←'; margin-right:7px; font-size:17px}
+.career-ui :is(#journeyReview,#seasonArchiveDialog) :is(#reviewContent,#archiveContent) {min-height:0; flex:1 1 auto; overflow:auto; overscroll-behavior:contain; padding:7px 1px 18px; scrollbar-width:thin}
+.career-ui :is(#journeyReview,#seasonArchiveDialog)>.main-action {flex-shrink:0; position:static; min-height:56px; margin:0 0 max(16px,env(safe-area-inset-bottom)); border-radius:16px; box-shadow:none; font-size:15px}
+.career-ui #matchReplayDialog {padding-bottom:0}
+.career-ui #matchReplayDialog>.experience-body {padding:7px 1px 16px; scrollbar-width:thin}
+.career-ui #matchReplayDialog>.decision-actions {padding:14px 0 max(16px,env(safe-area-inset-bottom)); gap:10px}
+.career-ui #matchReplayDialog>.decision-actions>button {min-height:56px; border-radius:16px; font-size:14px; padding:15px 12px}
+.career-ui #matchReplayDialog .baseball-score {padding:16px 0; margin:8px 0 19px}
+.career-ui #matchReplayDialog .baseball-score strong {font-size:39px; color:#202833}
+.career-ui #matchReplayDialog .baseball-score span {font-size:15px; font-weight:600; color:#34455d}
+.career-ui #matchReplayDialog .replay-field {background:#e7f3ec}
+.career-ui #matchReplayDialog .replay-field svg {width:100%; max-height:none; aspect-ratio:2/1; height:auto; display:block}
+.career-ui #matchReplayDialog .replay-call {font-size:14px; padding:18px 20px; margin-bottom:12px}
+.career-ui #matchReplayDialog .replay-status35 {font-size:12px; margin:0 0 3px}
+.career-ui #matchReplayDialog #replayProgress35 {height:5px; margin-bottom:18px}
+.replay-toolbar36 {display:flex; align-items:center; justify-content:space-between; gap:14px; margin:8px 0}
+.career-ui .replay-toolbar36 button {min-height:44px; padding:10px 17px; font-size:13px; border-radius:12px}
+.replay-toolbar36 label {display:flex; align-items:center; gap:10px; font-size:12px; color:#8290a2}
+.career-ui .replay-toolbar36 select {font-size:13px; padding:8px 12px; min-height:44px; width:76px; border:0; background:#f3f5f8}
+.replay-intro36 {padding:27px 0 17px}
+.replay-intro36 .flow-eyebrow {font-size:13px; color:#7c8da5; margin:0 0 13px}
+.career-ui #matchReplayDialog .replay-intro36 h2 {font-size:28px; line-height:1.5; margin:0 0 18px; color:#202833}
+.replay-intro36>p:last-child {font-size:14px; color:#7286a1; line-height:1.9; margin:0}
+.replay-preview36 {margin:20px 0 8px; padding:24px; background:#f3f5f8; border-radius:22px; text-align:center}
+.replay-preview36 p {font-size:15px; font-weight:600; color:#425a77; margin:0 0 20px}
+.career-ui .replay-preview36 button {width:100%; min-height:54px; border-radius:16px; font-size:15px}
+.replay-preview36 small {display:block; margin-top:14px; font-size:12px; color:#8191a7}
+.career-ui #matchReplayDialog .replay-feed35 li {font-size:14px; grid-template-columns:48px minmax(0,1fr); padding:16px 0; gap:15px}
+.career-ui #matchReplayDialog .replay-personal35 {margin:4px 0 8px; padding:17px 0}
+.career-ui #matchReplayDialog .replay-personal35 strong {font-size:22px}
+.career-ui #matchReplayDialog .replay-personal35 small {font-size:12px}
+.career-ui #matchReplayDialog .replay-lines35 summary {font-size:13px; min-height:44px}
+.career-ui #matchReplayDialog .fiction-note {font-size:12px; line-height:1.8; margin:13px 0; color:#8492a6}
+.career-ui #matchReplayDialog .replay-navigation35 button {font-size:13px}
+.career-ui #matchReplayDialog .replay-review36 {width:100%; margin:12px 0 0; min-height:52px; font-size:14px; border-radius:15px; background:#edf4ff; color:#3478eb}
+.career-ui #matchReplayDialog[data-phase=preview] .fiction-note {display:none}
+.career-ui #matchReplayDialog[data-phase=result] .replay-field {display:none}
+.career-ui #matchReplayDialog[data-phase=result] .baseball-score {margin:24px 0 20px; padding:25px 0}
+.career-ui #matchReplayDialog[data-phase=result] .baseball-score strong {font-size:48px}
+.career-ui #matchReplayDialog[data-phase=result] .replay-call {text-align:center; background:#f5f7fa}
+.career-ui :is(#journeyReview,#seasonArchiveDialog) .review-title {font-size:28px; line-height:1.5; margin:12px 0 20px}
+.career-ui :is(#journeyReview,#seasonArchiveDialog) .recap30 {background:#f4f6f9; border-radius:24px; padding:24px; margin:18px 0}
+.career-ui :is(#journeyReview,#seasonArchiveDialog) .recap-overall30>strong {font-size:34px}
+.career-ui :is(#journeyReview,#seasonArchiveDialog) .recap-metrics30 strong {font-size:23px}
+.career-ui :is(#journeyReview,#seasonArchiveDialog) :is(.recap-club30>span:not(.club-mark),.recap-metrics30 small,.recap-focus30 span) {font-size:13px}
+.career-ui :is(#journeyReview,#seasonArchiveDialog) :is(.recap-rate30,.report-row,.fan-comment p) {font-size:14px; line-height:1.85}
+.career-ui :is(#journeyReview,#seasonArchiveDialog) .chapter-tabs24 button {font-size:14px; min-height:48px}
+.career-ui :is(#journeyReview,#seasonArchiveDialog) .report-attribute-row {min-height:46px}
+.career-ui #seasonProgressDialog {padding:54px 26px 0}
+.career-ui #seasonProgressDialog #seasonProgressPhase {font-size:25px}
+.career-ui #seasonProgressDialog .decision-note {font-size:12px; line-height:1.8}
+.career-ui #seasonProgressDialog #seasonLandmarks25 li strong {font-size:14px}
+.career-ui #seasonProgressDialog #seasonLandmarks25 li small {font-size:12px}
+/* The wizard starts directly at the back action and its four-step indicator. */
+.career-ui.creating-player header {display:none}
+.career-ui.creating-player #create {padding-top:16px}
+.career-ui.creating-player #wizardTitle {white-space:pre-line; font-size:28px; line-height:1.45; margin:10px 0 17px}
+.career-ui.creating-player #wizardKicker35 {font-size:13px}
+.career-ui.creating-player .wizard-step .screen-intro {font-size:14px}
+.career-ui.creating-player .diamond-prospect span {font-size:13px}
+.career-ui.creating-player .diamond-prospect small {font-size:12px}
+.career-ui.creating-player #wizardNext {font-size:15px}
+@media(max-width:600px) {
+ .career-ui :is(#matchReplayDialog,#journeyReview,#seasonArchiveDialog,#seasonProgressDialog) {padding-left:20px; padding-right:20px}
+ .career-ui :is(#matchReplayDialog,#journeyReview,#seasonArchiveDialog)>.dialog-top {flex-basis:60px; min-height:60px}
+ .career-ui #matchReplayDialog .baseball-score {gap:9px; padding:13px 0; margin:4px 0 14px}
+ .career-ui #matchReplayDialog .baseball-score span {font-size:13px}
+ .career-ui #matchReplayDialog .baseball-score strong {font-size:33px}
+ .career-ui #matchReplayDialog .replay-field svg {aspect-ratio:1.7/1}
+ .career-ui #matchReplayDialog .replay-call {font-size:13px; padding:16px}
+ .career-ui #matchReplayDialog .replay-feed35 li {font-size:13px; gap:10px}
+ .career-ui #matchReplayDialog .replay-intro36 h2 {font-size:25px}
+ .career-ui #matchReplayDialog>.decision-actions {padding-top:12px; padding-bottom:max(12px,env(safe-area-inset-bottom))}
+ .career-ui #matchReplayDialog>.decision-actions>button {min-height:54px; font-size:13px}
+ .career-ui :is(#journeyReview,#seasonArchiveDialog) .recap30 {padding:20px}
+ .career-ui :is(#journeyReview,#seasonArchiveDialog) .recap-metrics30 strong {font-size:20px}
+ .career-ui #seasonProgressDialog {padding-top:40px}
+ .career-ui #seasonProgressDialog #seasonProgressPhase {font-size:22px}
+ .career-ui.creating-player #wizardTitle {font-size:26px}
+}
+@media(max-height:700px) {
+ .replay-intro36 {padding-top:8px}
+ .career-ui #matchReplayDialog .replay-intro36 h2 {font-size:23px; margin-bottom:12px}
+ .career-ui #matchReplayDialog .baseball-score {padding:8px 0; margin-bottom:12px}
+ .replay-preview36 {padding:18px; margin-top:12px}
+ .career-ui #seasonProgressDialog {padding-top:24px}
+ .career-ui #seasonProgressDialog #seasonProgressPhase {font-size:19px}
+}
+.career-ui :is(#matchReplayDialog,#journeyReview,#seasonArchiveDialog,#seasonProgressDialog)[open] {animation:none!important}
+.replay-absent36 {font-size:13px; line-height:1.8; color:#7b8da7; margin:0 0 16px; text-align:center}
+.replay-face36 {width:74px; height:94px; object-fit:contain; border-radius:17px; background:#f7f9fb; flex:none}
+.replay-preview36>.replay-face36 {display:block; margin:0 auto 13px; background:white}
+.replay-result36 {display:flex; align-items:center; justify-content:center; gap:18px; padding:16px 0 4px}
+.replay-result36 strong {display:block; font-size:20px; color:#273d58}
+.replay-result36 small {display:block; font-size:12px; color:#8192a9; margin-top:8px}
+@media(max-width:600px) {.replay-result36 strong {font-size:18px}.replay-face36 {width:62px; height:80px}}
+.career-ui #matchReplayDialog[data-phase=preview] .replay-call {display:none}
+@media(max-width:600px) {
+ .replay-preview36 {display:grid; grid-template-columns:62px minmax(0,1fr); gap:12px; align-items:center; text-align:left}
+ .replay-preview36>.replay-face36 {margin:0; grid-column:1; grid-row:1}
+ .replay-preview36>p {margin:0; font-size:14px; line-height:1.7}
+ .replay-preview36>button,.replay-preview36>small {grid-column:1/-1}
+ .replay-preview36>small {margin:0; text-align:center}
+}
+@media(max-height:700px) {.replay-preview36>.replay-face36 {height:66px; width:52px}.replay-preview36 {padding:14px 18px}}
+.career-ui .replay-preview36>button.secondary {background:white; color:#536f94; border:1px solid #e6ebf2}

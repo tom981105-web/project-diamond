@@ -1,0 +1,295 @@
+/* V3.4: consistent original baseball presentation across every career surface. */
+body.career-ui {
+ --accent:#3478eb; --soft:#edf4ff; --ink:#202833; --muted:#758399; --line:#edf0f4;
+ --screen-card-radius:24px; --screen-card-gap:12px; --screen-copy:14px;
+ background:#f2f3f5; color:var(--ink); font-size:var(--screen-copy); line-height:1.65;
+}
+.career-ui main {background:#f2f3f5; padding-bottom:192px}
+.career-ui header {height:80px; margin-bottom:0; padding:0 10px}
+.career-ui header h1 {font-size:19px; letter-spacing:-.04em}
+.career-ui .header-tools {gap:3px}
+.career-ui .header-tools .icon-button {width:38px; height:44px; padding:9px; color:#7c8795; min-height:44px}
+.career-ui .header-tools svg {width:21px; height:21px}
+.career-ui :is(.panel,.surface-card,.player-card,.player-summary,.next-step-card) {
+ border-radius:var(--screen-card-radius); margin-bottom:var(--screen-card-gap); box-shadow:none;
+}
+.career-ui :is(button,input,select) {font-weight:500}
+.career-ui button {min-height:44px}
+.career-ui :is(button,input,select,summary):focus-visible {outline:3px solid #8ab6fc; outline-offset:3px}
+.career-ui button:disabled {cursor:not-allowed}
+.career-ui h2,.career-ui h3 {font-weight:700; letter-spacing:-.035em}
+/* Home: identity and three career totals; current preparation has its own short strip. */
+.career-ui #homeIdentity {gap:14px}
+.career-ui #homeIdentity .player-portrait {width:72px; height:78px; background:#f5f7f6}
+.career-ui #homeIdentityCopy #teamLabel {font-size:13px; line-height:1.65}
+.career-ui #homeIdentityCopy #profileLabel {font-size:12px}
+.career-ui #homeRating>strong {font-size:23px}
+.career-ui #homeRating>small {font-size:12px}
+.career-ui #homeStats {padding:14px 0 0; margin-top:16px}
+.career-ui #homeStats .quick-stat span {font-size:12px; color:#7b8ca3}
+.career-ui #homeStats .quick-stat strong {font-size:19px; margin-top:7px; color:#253b55}
+.career-ui #homeNextCard {padding:0}
+.career-ui #journeyTodo {padding:25px 22px 8px}
+.career-ui #journeyTodo>h3 {font-size:16px; margin-bottom:15px}
+.career-ui #journeyTodo .flow-task {min-height:78px; padding:14px 0; gap:14px}
+.career-ui .flow-task-copy strong {font-size:15px; font-weight:600}
+.career-ui .flow-task-copy small {font-size:12px; line-height:1.7}
+.career-ui .flow-task-icon {width:40px; height:40px; border-radius:50%}
+.career-ui #homeNextCard>#journeyAction {padding:8px 22px 17px; min-height:36px; font-size:12px}
+.career-ui #homeContext34 {display:grid; grid-template-columns:1.1fr 1fr; align-items:center; gap:20px; padding:15px 22px}
+.career-ui #homeContext34[hidden] {display:none}
+.career-ui #homeContext34 #homeSeason25 {margin:0; padding:0; border:0; min-height:44px; background:transparent}
+.career-ui #homeContext34 #homeSeason25 strong {font-size:12px; font-weight:500}
+.career-ui #homeContext34 #homeSeason25 small {font-size:11px}
+.career-ui #homeContext34 #homeSeason25 progress {height:4px; margin-top:9px}
+.career-ui #homeContext34 #homePreparation29 {margin:0; padding:4px 0; border-radius:0; background:transparent; min-height:44px}
+.career-ui #homeContext34 #homePreparation29 small {font-size:11px; color:#8a97aa}
+.career-ui #homeContext34 #homePreparation29 strong {font-size:12px; font-weight:500; line-height:1.6}
+.career-ui #careerShop {padding:0 22px}
+.career-ui .shop-entry {min-height:87px}
+.career-ui .shop-entry strong {font-size:14px}
+.career-ui .shop-entry small {font-size:12px}
+.career-ui .home-shortcuts {border-radius:17px}
+.career-ui .home-shortcuts button {font-size:12px; min-height:48px}
+/* Season cards use the same label, value and secondary-action hierarchy. */
+.career-ui #seasonStory {padding:24px 22px}
+.career-ui #seasonStory h2:has(#seasonPrimaryMetric) {font-size:28px; margin:10px 0}
+.career-ui #seasonStory.has-player25>.flow-eyebrow {font-size:13px}
+.career-ui #seasonStory.has-player25>.season-growth {font-size:13px}
+.career-ui .chapter-stats strong {font-size:21px}
+.career-ui #seasonSituation31 {padding:22px}
+.career-ui #seasonSituation31 h3 {font-size:18px}
+.career-ui #seasonSituation31>p {font-size:13px; line-height:1.85}
+.career-ui #prepareAction31 {background:#edf4ff; color:#567ba9; min-height:44px}
+.career-ui #careerCoach24,.career-ui #lifeChapter {padding:22px}
+.career-ui #careerCoach24>h3,.career-ui #lifeChapter>h3 {font-size:16px}
+.career-ui #careerCoach24 :is(p,button),.career-ui #lifeChapter :is(p,button) {font-size:12px}
+.career-ui #diamondNav {width:min(776px,calc(100% - 24px)); bottom:8px; border-radius:24px; min-height:84px; padding:10px 18px calc(12px + env(safe-area-inset-bottom)); box-shadow:0 1px 0 #edf0f4 inset}
+.career-ui #diamondNav .diamond-tab {background:transparent; border-radius:12px; font-size:11px; min-height:50px; color:#7f8998}
+.career-ui #diamondNav .diamond-tab.is-active {background:transparent; color:#202833}
+.career-ui[data-career-phase=season] #screen-league #seasonBtn:not(.hidden) {bottom:calc(104px + env(safe-area-inset-bottom))}
+/* Player: keep the first two cards focused on identity and the six real attributes. */
+.career-ui #playerIdentity {padding:24px 22px}
+.career-ui #playerIdentity .summary-portrait {width:92px; height:104px; border-radius:18px}
+.career-ui #playerIdentity .identity-copy h2 {font-size:26px; margin:6px 0}
+.career-ui #playerIdentity .profile-overview {margin-top:18px; padding-top:17px}
+.career-ui #playerIdentity .profile-overview strong {font-size:21px}
+.career-ui #playerIdentity .player-rating33>strong {font-size:24px}
+.career-ui #playerIdentity .player-rating-change33 {font-size:11px; margin-top:1px}
+.career-ui .player-attributes33 {position:relative; padding:25px 22px 18px}
+.career-ui .player-attributes33>h2 {font-size:18px; margin-bottom:15px}
+.career-ui #attributeScale33 {display:none}
+.career-ui #attributeLegend {font-size:12px; margin:0 0 14px; color:#8390a2}
+.career-ui #attributes .attr {height:50px; gap:12px; grid-template-columns:70px minmax(0,1fr) 68px}
+.career-ui #attributes .attrline>span {font-size:14px; color:#566e8b}
+.career-ui #attributes .attrline>strong {font-size:16px}
+.career-ui #attributes .bar {height:6px; background:#f0f2f5}
+.career-ui #attributes .bar span {background:#9eabba}
+.career-ui #attributes .is-focused .bar span {background:#3478eb}
+.career-ui #playerSceneEntry27 {background:transparent; border-top:1px solid #edf0f4; padding:12px 0 0; margin:13px 0 0; border-radius:0; font-size:12px; min-height:44px; color:#6e84a1}
+/* Reactions and records share the same white surfaces and compact row structure. */
+.career-ui #reactionFilter34 {display:flex; justify-content:space-between; align-items:center; gap:16px; padding:20px 22px}
+.career-ui #reactionFilter34 label {font-size:15px; font-weight:650}
+.career-ui #reactionYear34 {width:auto; max-width:48%; min-height:40px; font-size:12px; background:#f7f8fa}
+.career-ui #journeyArticles>.news-article {background:white; border:0; border-radius:24px; padding:24px 22px; margin-bottom:12px}
+.career-ui #journeyArticles>.news-article[hidden] {display:none}
+.career-ui #journeyArticles>.news-article>.flow-eyebrow {font-size:12px; margin:0 0 18px; color:#8290a3}
+.career-ui .press-story {background:#f7f8fa; border-radius:14px; padding:17px 18px; margin:12px 0}
+.career-ui .press-story small {font-size:11px; margin-bottom:8px}
+.career-ui .press-story strong {font-size:15px; line-height:1.75; font-weight:650}
+.career-ui .press-story p {font-size:12px; line-height:1.8}
+.career-ui .fan-comment {gap:12px; padding:19px 0; border-color:#f2f4f6}
+.career-ui .fan-avatar {width:28px; height:28px; font-size:11px}
+.career-ui .fan-comment:nth-of-type(3n) .fan-avatar {color:#8867af; background:#f5eefb}
+.career-ui .fan-comment:nth-of-type(3n+1) .fan-avatar {color:#4a927f; background:#eaf7f1}
+.career-ui .fan-comment strong {font-size:12px; color:#637892}
+.career-ui .fan-comment p {font-size:13px; margin:6px 0 8px; color:#374b64; line-height:1.8}
+.career-ui .fan-comment small,.career-ui .fan-count {font-size:11px; color:#98a3b2}
+.career-ui .fiction-note {font-size:11px!important; line-height:1.8}
+.career-ui #journeyArticles .news-article>button {min-height:44px; width:100%; background:#f5f7fa; color:#6b82a1; font-size:12px; margin-top:10px}
+.career-ui #screen-career:not([hidden]) {display:flex; flex-direction:column}
+.career-ui #trophyCabinet {order:-2; padding:24px 22px}
+.career-ui #trophyCabinet>h2 {font-size:22px; margin-bottom:15px}
+.career-ui #trophyCabinet summary {font-size:12px}
+.career-ui #careerExplorer {order:-1; padding:24px 22px}
+.career-ui #careerExplorer>h2 {font-size:17px; margin-bottom:16px}
+.career-ui .record-levels {margin:0 0 20px; padding:4px; border-radius:11px}
+.career-ui .record-levels button {font-size:12px; min-height:36px; padding:8px}
+.career-ui .record-selects {gap:14px}
+.career-ui .record-selects label {font-size:12px; background:transparent; padding:0}
+.career-ui .record-selects select {background:#f6f8fa; padding:10px 12px; border-radius:10px; min-height:44px; font-size:13px}
+.career-ui .record-total-grid {padding:21px 0 7px; gap:12px}
+.career-ui .record-total-grid small {font-size:12px}
+.career-ui .record-total-grid strong {font-size:21px; color:#344d70; margin-top:9px}
+.career-ui .career-record-row {font-size:13px; line-height:1.7; padding:17px 0}
+.career-ui .archive-season-button {font-size:13px}
+/* Dialogs: common wide desktop sheet, bottom sheet on phones, persistent clear actions. */
+.career-ui :is(.career-dialog,.experience-dialog,.settings-dialog) {
+ width:min(800px,calc(100% - 32px)); max-width:800px; max-height:calc(100dvh - 32px);
+ height:auto; margin:auto; padding:24px; border:0; border-radius:26px; background:#fff;
+ color:#26394f; box-shadow:none; overflow:auto; overscroll-behavior:contain;
+}
+.career-ui :is(.career-dialog,.review-dialog,.settings-dialog)::backdrop {background:#1e283b66; backdrop-filter:none}
+.career-ui :is(.career-dialog,.experience-dialog,.settings-dialog)>.dialog-top {
+ position:sticky; top:-24px; background:#fff; z-index:4; padding:10px 0; margin:0 0 12px;
+ display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.career-ui :is(.career-dialog,.experience-dialog,.settings-dialog) .dialog-top :is(h2,.page-eyebrow) {font-size:13px; color:#7b8b9f; margin:0}
+.career-ui :is(.career-dialog,.review-dialog,.settings-dialog) .dialog-top>button {min-height:44px; min-width:44px; padding:8px 12px; font-size:12px; border-radius:12px; background:#f5f6f8; color:#7c8b9f}
+.career-ui :is(.career-dialog,.experience-dialog) h2 {font-size:22px; margin:14px 0; line-height:1.5}
+.career-ui .experience-dialog h3 {font-size:21px; line-height:1.55; margin:18px 0 12px}
+.career-ui .experience-dialog p {font-size:13px; line-height:1.85; color:#7a8a9f}
+.career-ui :is(.career-dialog,.experience-dialog) .decision-actions {
+ position:sticky; bottom:-24px; z-index:3; background:#fff; padding:16px 0 calc(24px + env(safe-area-inset-bottom)); margin:16px 0 -24px;
+ display:flex; gap:10px; flex-wrap:nowrap;
+}
+.career-ui :is(.career-dialog,.experience-dialog) .decision-actions>button {min-width:0; min-height:50px; font-size:14px; padding:14px 12px; border-radius:14px; flex:1; line-height:1.5}
+.career-ui #trainingPlanDialog33 .decision-actions {display:grid; grid-template-columns:1fr 1.7fr}
+.career-ui :is(.decision-row,.report-row) {font-size:13px; padding:14px 0; line-height:1.8}
+.career-ui .decision-note {font-size:12px; line-height:1.85; margin:17px 0; color:#8795a8}
+.career-ui .decision-club {font-size:24px; line-height:1.5; color:#26394f}
+.career-ui .decision-rows {margin:20px 0}
+.career-ui .decision-rows .decision-row:last-child {border-bottom:0}
+.career-ui .contract-card {padding:18px; border-radius:17px; border:1px solid #edf0f4; background:#fff; margin:12px 0}
+.career-ui .contract-card:has(input:checked) {border-color:#7da9f5; background:#f6f9ff}
+.career-ui .contract-option {min-height:66px; gap:12px}
+.career-ui .contract-option strong {font-size:15px; font-weight:650}
+.career-ui .contract-card .contract-pay {font-size:14px; margin-top:8px}
+.career-ui .contract-inspect {font-size:12px; min-height:44px; background:#f2f6fc}
+.career-ui .market-evaluation>summary {font-size:13px; min-height:44px}
+.career-ui .market-evaluation p {font-size:12px; line-height:1.85}
+.career-ui .signature-panel {background:#f7f9fb; border-radius:16px; padding:18px; margin:20px 0}
+.career-ui .signature-panel h3 {font-size:16px}
+.career-ui .signature-panel canvas {height:150px; border:1px dashed #cfdae7; border-radius:14px; background:#fff}
+.career-ui .signature-panel :is(label,input) {font-size:13px}
+.career-ui .signature-panel>button {font-size:12px; min-height:44px}
+.career-ui #storyDialog22 .story-scene {width:min(100%,384px); height:230px; object-fit:cover; margin:4px auto 22px; border-radius:16px}
+.career-ui #storyDialog22 .coach-scene24 {max-width:384px; min-height:210px; margin:4px auto 22px; border-radius:16px; background:linear-gradient(0deg,#ddc9ad 0 20%,transparent 20%),linear-gradient(125deg,#edf2f0,#d8e6df); gap:24px; padding:25px}
+.career-ui #storyDialog22 .coach-board {box-shadow:5px 6px 0 #b2c6b9; border-radius:9px}
+.career-ui #storyDialog22 .story-context {font-size:12px; margin:12px 0}
+.career-ui #storyDialog22 h3 {font-size:22px; line-height:1.6}
+.career-ui #storyDialog22 .story-conversation {background:transparent; padding:10px 0; border-bottom:1px solid #f1f3f6; border-radius:0; gap:10px}
+.career-ui #storyDialog22 .story-conversation strong {font-size:12px}
+.career-ui #storyDialog22 .story-conversation p {font-size:12px; margin:5px 0 0}
+.career-ui #storyDialog22 .speaker-mark {width:32px; height:32px; border-radius:50%}
+.career-ui #storyDialog22 .choice-player26 {margin:13px 0 10px; gap:9px}
+.career-ui #storyDialog22 .choice-player26 img {width:28px; height:35px; border-radius:8px}
+.career-ui #storyDialog22 .life-options {gap:10px; margin:12px 0 20px}
+.career-ui #storyDialog22 .life-options button {padding:18px; border:0; border-radius:15px; background:#f7f8fa; color:#28394d; min-height:74px; font-size:14px}
+.career-ui #storyDialog22 .life-options button::before,.career-ui #storyDialog22 .life-options button::after {display:none}
+.career-ui #storyDialog22 .life-options button strong {font-size:14px; font-weight:600}
+.career-ui #storyDialog22 .life-options button small {font-size:12px; line-height:1.8; margin-top:7px; color:#8290a4}
+.career-ui #storyDialog22 .life-options button:hover {background:#edf4ff}
+.career-ui #storyDialog22 .story-rules {font-size:12px; margin:12px 0 18px}
+.career-ui #skipStory22 {width:100%; min-height:50px; background:#f2f4f7; font-size:14px}
+.career-ui #lifeMomentDialog .life-options button {font-size:14px; padding:18px; min-height:78px; border-radius:15px}
+.career-ui .review-dialog {width:min(800px,100%); max-width:800px; padding:28px 26px 0; color:#26394f}
+.career-ui .review-dialog .review-title {font-size:27px; line-height:1.5}
+.career-ui .review-dialog h2 {font-size:17px; margin:27px 0 14px}
+.career-ui .review-dialog .report-row {font-size:13px}
+.career-ui .review-dialog .review-footnote {font-size:11px; line-height:1.8}
+.career-ui .review-dialog .recap30 {background:#f7f9fc; border:0; padding:20px; border-radius:17px}
+.career-ui .recap-metrics30 small,.career-ui .recap-focus30 span {font-size:12px}
+.career-ui .recap-focus30 strong {font-size:13px}
+.career-ui .recap-rate30 {font-size:13px}
+.career-ui .recap-club30>small {font-size:11px}
+.career-ui .review-dialog :is(#confirmReview,#returnFromArchive) {min-height:54px; font-size:14px; border-radius:14px; padding:16px; background:#3478eb; margin-bottom:14px; bottom:0; box-shadow:0 -12px 0 #fff}
+.career-ui .chapter-tabs24>button {font-size:12px; min-height:44px}
+.career-ui .hub-report-actions29 button {font-size:13px; min-height:48px}
+.career-ui #matchReportDialog29 .hub-note29 {font-size:12px}
+@media(min-width:601px) {
+ .career-ui .player-attributes33 #attributeLegend {position:absolute; right:22px; top:29px; max-width:66%; text-align:right; margin:0}
+}
+@media(max-width:600px) {
+ .career-ui main {padding-left:12px; padding-right:12px}
+ .career-ui header {height:68px; padding:0 7px}
+ .career-ui header h1 {font-size:18px}
+ .career-ui .header-tools .icon-button {width:34px; padding:7px}
+ .career-ui :is(.panel,.surface-card,.player-card,.player-summary) {padding:22px 20px}
+ .career-ui #homeIdentity .player-portrait {width:64px; height:74px}
+ .career-ui #homeRating>strong {font-size:21px}
+ .career-ui #homeNextCard {padding:0}
+ .career-ui #journeyTodo {padding:22px 20px 7px}
+ .career-ui .flow-task-copy strong {font-size:14px}
+ .career-ui #homeContext34 {padding:14px 20px; gap:14px; grid-template-columns:1fr 1fr}
+ .career-ui #homeContext34 #homeSeason25>span {display:grid; gap:3px}
+ .career-ui #homeContext34 #homePreparation29 strong {font-size:11px}
+ .career-ui #seasonStory {padding:23px 20px}
+ .career-ui #seasonStory h2:has(#seasonPrimaryMetric) {font-size:27px}
+ .career-ui #seasonStory.has-player25>.flow-eyebrow {font-size:12px}
+ .career-ui #playerIdentity {padding:23px 20px}
+ .career-ui #playerIdentity .summary-portrait {width:74px; height:91px}
+ .career-ui #playerIdentity .identity-copy h2 {font-size:22px}
+ .career-ui #playerIdentity .player-rating33>strong {font-size:23px}
+ .career-ui #attributes .attr {grid-template-columns:55px minmax(0,1fr) 62px; gap:8px}
+ .career-ui #attributeLegend {font-size:11px; margin-bottom:12px}
+ .career-ui #reactionFilter34 {padding:18px 20px; gap:10px}
+ .career-ui #reactionFilter34 label {font-size:14px}
+ .career-ui #journeyArticles>.news-article {padding:22px 20px}
+ .career-ui #trophyCabinet,.career-ui #careerExplorer {padding:22px 20px}
+ .career-ui .record-total-grid {gap:8px}
+ .career-ui .record-total-grid strong {font-size:19px}
+ .career-ui :is(.career-dialog,.experience-dialog,.settings-dialog):not(#matchReplayDialog) {
+  position:fixed; inset:auto 0 0; margin:0 auto; width:100%; max-width:100%; height:auto;
+  max-height:calc(100dvh - 16px); border-radius:24px 24px 0 0; padding:20px 20px;
+ }
+ .career-ui :is(.career-dialog,.experience-dialog,.settings-dialog)>.dialog-top {top:-20px}
+ .career-ui :is(.career-dialog,.experience-dialog) .decision-actions {bottom:-20px; padding-bottom:calc(20px + env(safe-area-inset-bottom)); margin-bottom:-20px}
+ .career-ui :is(.career-dialog,.experience-dialog) .decision-actions>button {font-size:13px; padding:13px 9px}
+ .career-ui #trainingPlanDialog33 .decision-actions {margin-bottom:-20px}
+ .career-ui #storyDialog22 .story-scene {width:min(100%,320px); height:180px}
+ .career-ui #storyDialog22 .coach-scene24 {min-height:170px; gap:16px; padding:20px; max-width:320px}
+ .career-ui #storyDialog22 h3 {font-size:20px}
+ .career-ui #storyDialog22 .life-options button {padding:16px; min-height:72px}
+ .career-ui .signature-panel {padding:15px}
+ .career-ui .signature-panel canvas {height:120px}
+ .career-ui .review-dialog {padding:23px 20px 0}
+ .career-ui .review-dialog .review-title {font-size:25px}
+}
+@media(max-width:360px) {
+ .career-ui #homeStats .quick-stat strong {font-size:18px}
+ .career-ui #homeContext34 {gap:10px}
+ .career-ui #homeContext34 #homeSeason25 strong {font-size:11px}
+ .career-ui #homeContext34 #homePreparation29 strong {font-size:11px}
+ .career-ui #reactionFilter34 {align-items:flex-start; flex-direction:column}
+ .career-ui #reactionYear34 {max-width:100%; width:100%}
+ .career-ui .record-selects {grid-template-columns:1fr}
+ .career-ui .record-total-grid {grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px}
+}
+@media(prefers-reduced-motion:reduce) {.career-ui :is(dialog,.journey-screen) {animation:none; scroll-behavior:auto}}
+/* Contrast and compact comparison fixes found during the full-screen review. */
+.career-ui #homeIdentityCopy #profileLabel {display:none}
+.career-ui #screen-dashboard>.hero,.career-ui .player-card {padding:20px 22px}
+.career-ui .archive-season-card {background:#fff; color:#344b68; padding:18px 0; border-bottom:1px solid #edf0f4; min-height:80px; border-radius:0}
+.career-ui .archive-season-card:hover {background:#f5f8fd}
+.career-ui .archive-season-card strong {font-size:14px; font-weight:600}
+.career-ui .archive-season-card small {font-size:12px; color:#8795aa}
+.career-ui .record-filters {padding:4px; background:#edf0f5; border-radius:13px; gap:4px}
+.career-ui .record-filters button {background:transparent; color:#7b8da6; font-size:12px; min-height:40px; border-radius:10px}
+.career-ui .record-filters button[aria-pressed=true],.career-ui .record-filters button.active {background:#fff; color:#3478eb}
+.career-ui #journeyArticles>[hidden] {display:none}
+.career-ui .contract-comparison34 {background:#f7f8fa; border-radius:14px; padding:0 17px; margin:16px 0}
+.career-ui .contract-comparison34>summary {font-size:12px; color:#7c8da5; cursor:pointer; padding:14px 0; min-height:44px}
+.career-ui .contract-comparison34 .decision-row {font-size:12px; padding:10px 0}
+.career-ui .decision-rows .decision-row:nth-child(4)>strong {color:#3478eb}
+.career-ui #signatureName {color:#344b68; background:#fff}
+@media(max-width:600px) {.career-ui .player-card {padding:20px}.career-ui .archive-season-card {gap:9px}.career-ui .archive-season-card strong {font-size:13px}}
+/* Fit the real contract and both signature methods into a shorter reading flow. */
+.career-ui #careerAdvanceDialog>h2 {font-size:20px; margin:8px 0}
+.career-ui #careerAdvanceDialog .decision-club {margin:10px 0 4px}
+.career-ui #careerAdvanceDialog .decision-rows {margin:12px 0}
+.career-ui #careerAdvanceDialog .decision-row {padding:10px 0}
+.career-ui #careerAdvanceDialog .decision-note {margin:10px 0; font-size:12px}
+.career-ui #careerAdvanceDialog .signature-panel {background:transparent; padding:0; border:0; margin:18px 0 10px}
+.career-ui #careerAdvanceDialog .signature-panel h3 {margin:0 0 7px; font-size:16px}
+.career-ui #careerAdvanceDialog .signature-panel canvas {height:120px; margin:10px 0}
+.career-ui .signature-name-row34 {display:grid; grid-template-columns:minmax(0,1fr) auto; gap:7px 10px; align-items:center}
+.career-ui .signature-name-row34 label {grid-column:1/-1; font-size:12px; color:#8190a5}
+.career-ui .signature-name-row34 input {margin:0; min-height:44px}
+.career-ui .signature-name-row34 button {font-size:12px; min-height:44px}
+/* Contract actions occupy their own row, never covering the scrollable signature. */
+.career-ui :is(#careerAdvanceDialog,#contractDetailDialog)[open] {display:flex; flex-direction:column; overflow:hidden; min-height:0}
+.career-ui :is(#careerAdvanceDialog,#contractDetailDialog)>.dialog-top {position:static; flex-shrink:0}
+.career-ui :is(#careerAdvanceDialog,#contractDetailDialog)>h2 {flex-shrink:0}
+.career-ui :is(#careerAdvanceDialog,#contractDetailDialog)>.decision-content {min-height:0; flex:1 1 auto; overflow:auto; overscroll-behavior:contain; padding-right:2px}
+.career-ui :is(#careerAdvanceDialog,#contractDetailDialog)>.decision-actions {position:static; flex:0 0 auto; margin:0; padding:16px 0 calc(8px + env(safe-area-inset-bottom))}

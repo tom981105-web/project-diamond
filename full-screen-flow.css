@@ -102,3 +102,18 @@
 }
 .career-ui :is(#matchReplayDialog,#journeyReview,#seasonArchiveDialog,#seasonProgressDialog)[open] {animation:none!important}
 .replay-absent36 {font-size:13px; line-height:1.8; color:#7b8da7; margin:0 0 16px; text-align:center}
+.replay-face36 {width:74px; height:94px; object-fit:contain; border-radius:17px; background:#f7f9fb; flex:none}
+.replay-preview36>.replay-face36 {display:block; margin:0 auto 13px; background:white}
+.replay-result36 {display:flex; align-items:center; justify-content:center; gap:18px; padding:16px 0 4px}
+.replay-result36 strong {display:block; font-size:20px; color:#273d58}
+.replay-result36 small {display:block; font-size:12px; color:#8192a9; margin-top:8px}
+@media(max-width:600px) {.replay-result36 strong {font-size:18px}.replay-face36 {width:62px; height:80px}}
+.career-ui #matchReplayDialog[data-phase=preview] .replay-call {display:none}
+@media(max-width:600px) {
+ .replay-preview36 {display:grid; grid-template-columns:62px minmax(0,1fr); gap:12px; align-items:center; text-align:left}
+ .replay-preview36>.replay-face36 {margin:0; grid-column:1; grid-row:1}
+ .replay-preview36>p {margin:0; font-size:14px; line-height:1.7}
+ .replay-preview36>button,.replay-preview36>small {grid-column:1/-1}
+ .replay-preview36>small {margin:0; text-align:center}
+}
+@media(max-height:700px) {.replay-preview36>.replay-face36 {height:66px; width:52px}.replay-preview36 {padding:14px 18px}}

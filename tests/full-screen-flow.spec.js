@@ -8,7 +8,7 @@ async function create(page){
 for(const width of [320,390,800,1366])test(`creation and recorded match occupy a clear page at ${width}px`,async({page})=>{
  await page.setViewportSize({width,height:640});await page.goto('./');await page.click('#startJourney');await expect(page.locator('header')).not.toBeVisible();await expect(page.locator('#wizardBack')).toBeInViewport();await page.click('#wizardBack');await create(page);
  const before=await saved(page);await page.click('#openMatchReplay');await expect(page.locator('#matchReplayDialog')).toHaveAttribute('data-phase','preview');await expect(page.locator('#replayProgress35')).toHaveAttribute('value','0');await expect(page.locator('.baseball-score')).toContainText('0 : 0');
- const b=await page.locator('#matchReplayDialog').boundingBox();expect(b.y).toBe(0);expect(b.height).toBe(640);expect(b.width).toBe(Math.min(width,800));await expect(page.locator('#replayNext')).toBeInViewport();
+ const b=await page.locator('#matchReplayDialog').boundingBox();expect(b.y).toBe(0);expect(b.height).toBe(640);expect(b.width).toBe(Math.min(width,800));await expect(page.locator('#replayNext')).toBeInViewport();await expect(page.locator('#replayStart36')).toBeInViewport();
  await page.click('#replayNext');await expect(page.locator('#matchReplayDialog')).toHaveAttribute('data-phase','play');await expect(page.locator('#replayAuto36')).toBeVisible();await page.click('#replayFinish');await expect(page.locator('#replayExit36')).toBeInViewport();await page.click('#replayExit36');expect(await saved(page)).toEqual(before);
 });
 test('automatic playback, speed, pause and manual navigation use no simulation or save writes',async({page})=>{

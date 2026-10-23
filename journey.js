@@ -39,7 +39,7 @@
   $('screen-news').append(element('div','journeyArticles'));
   const filters=element('div','recordFilters','','record-filters');for(const [id,label] of [['seasons','시즌 기록'],['honors','수상·이적'],['amateur','아마·선택']]){const b=element('button',null,label);b.type='button';b.dataset.recordMode=id;b.onclick=()=>{recordMode=id;layout();};filters.append(b);}$('screen-career').append(filters);
   $('screen-career').append(element('section','journeyChoices','','panel'));
-  const review=element('dialog','journeyReview','<div class="dialog-top"><span class="page-eyebrow">SEASON REVIEW</span><button type="button" id="dismissReview" aria-label="결산 닫기">닫기</button></div><div id="reviewContent" class="review-content"></div><button type="button" class="main-action" id="confirmReview">다음 선택으로</button>','review-dialog');document.querySelector('main').append(review);
+  const review=element('dialog','journeyReview','<div class="dialog-top"><span class="page-eyebrow">SEASON REVIEW</span><button type="button" id="dismissReview" aria-label="결산 닫기">시즌으로</button></div><div id="reviewContent" class="review-content"></div><button type="button" class="main-action" id="confirmReview">다음 선택으로</button>','review-dialog');document.querySelector('main').append(review);
   $('dismissReview').onclick=()=>review.close();$('confirmReview').onclick=()=>{if(!state)return;const u=writable();u.reviewed[state.year]=true;save();review.close();nav().show('league');render();};
  }
  function totals(){
@@ -181,7 +181,7 @@
   $('wizardProgress').innerHTML=Array.from({length:4},(_,i)=>'<span class="'+(i<=wizardStep?'active':'')+'"></span>').join('');
   $('wizardCount').textContent=(wizardStep+1)+' / 4';$('createForm').dataset.step=wizardStep;
   $('wizardProgress').setAttribute('role','progressbar');$('wizardProgress').setAttribute('aria-label','선수 생성 단계');$('wizardProgress').setAttribute('aria-valuemin','1');$('wizardProgress').setAttribute('aria-valuemax','4');$('wizardProgress').setAttribute('aria-valuenow',String(wizardStep+1));
-  $('wizardKicker35').textContent=['나만의 선수','이름과 출발점','플레이 스타일','첫 훈련 계획'][wizardStep];$('wizardTitle').textContent=['나의 유니폼','선수의 첫 페이지','어떤 선수로 자랄까요?','집중할 성장 방향'][wizardStep];
+  $('wizardKicker35').textContent=['나만의 선수','이름과 출발점','플레이 스타일','첫 훈련 계획'][wizardStep];$('wizardTitle').textContent=['선수의 모습을\n골라 주세요','어떤 선수로\n시작할까요?','플레이 스타일을\n골라 주세요','성장 방향을\n정해 주세요'][wizardStep];
   $('wizardNext').hidden=wizardStep===3;$('createForm').querySelector('button[type=submit]').hidden=wizardStep!==3;
   $('wizardBack').textContent=wizardStep===0?'처음으로':'이전';
   if(wizardStep===3){const role=$('role').value,first=$('journeyFocus'),second=$('journeyFocusSecond'),keep=first.dataset.role===role,previous=first.value,previousSecond=second.value;first.innerHTML=ATTR[role].map((x,i)=>'<option value="'+i+'">'+x+'</option>').join('');second.innerHTML='<option value="-1">한 가지에 집중</option>'+ATTR[role].map((x,i)=>'<option value="'+i+'">'+x+'</option>').join('');if(keep){first.value=previous;second.value=previousSecond;}first.dataset.role=role;$('wizardSummary').textContent=$('playerName').value+' · '+$('position').value+' · '+$('hand').value+' · '+(document.querySelector('[name=amateurPath]:checked')?.value==='college'?'대학 야구에서 시작':'프로 신인으로 시작');}

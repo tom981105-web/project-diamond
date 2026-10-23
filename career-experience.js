@@ -115,6 +115,8 @@
 
  function paintReplay(){
   if(!replay||replay.owner!==state||replay.year!==state.year){pauseReplay();$('matchReplayDialog').close();return;}
+  const scrollBody=$('matchReplayDialog').querySelector('.experience-body'),keepScroll=replay.auto&&$('matchReplayDialog').dataset.phase==='play',scrollTop=scrollBody.scrollTop;
+  const focused=$('matchReplayDialog').contains(document.activeElement)?document.activeElement.id:null;
   const r=replay,m=r.match,frames=list(m.frames),plays=frames.flatMap(f=>list(f.plays).map(p=>({...p,inning:f.inning}))),p=plays[r.index],end=r.index>=plays.length;
   if(end){r.phase='result';pauseReplay();}
   const preview=r.phase==='preview';$('matchReplayDialog').dataset.phase=r.phase;
@@ -144,16 +146,18 @@
    '<div class="decision-actions">'+(end?'<button type="button" class="secondary" id="replayRestart36" '+(!plays.length?'disabled':'')+'>처음부터 보기</button><button type="button" id="replayExit36">돌아가기</button>':'')+'<button type="button" class="secondary" id="replayFinish" '+(end?'disabled hidden':'')+'>결과만 보기</button><button type="button" id="replayNext" '+(end?'disabled hidden':'')+'>'+(preview?'타석별로 보기':'다음 타석')+'</button></div>'+
    (end&&m===state.league?.last&&state.game===144&&!school()?'<button type="button" class="secondary replay-review36" id="replayReview36">이번 시즌 결산 보기</button>':'');
   const d=$('matchReplayDialog');d.append(d.querySelector('.experience-body > .decision-actions'));
-  d.querySelector('.experience-body').scrollTop=0;
+  d.querySelector('.experience-body').scrollTop=keepScroll?scrollTop:0;
   const manual=action=>{pauseReplay();r.phase='play';action();paintReplay();};
   $('replayNext').onclick=()=>manual(()=>{if(!preview)r.index++;});$('replayFinish').onclick=()=>manual(()=>{r.index=plays.length;});
   $('replayPrevious35').onclick=()=>manual(()=>{r.index=Math.max(0,r.index-1);});$('replayMine35').onclick=()=>manual(()=>{if(nextMine>=0)r.index=nextMine;});
   if($('replayStart36'))$('replayStart36').onclick=()=>{r.phase='play';r.auto=true;paintReplay();scheduleReplay();};
   $('replayAuto36').onclick=()=>{if(r.auto)pauseReplay();else{r.auto=true;paintReplay();scheduleReplay();}};
+  $('replaySpeed36').onfocus=()=>{if(r.auto)pauseReplay();};
   $('replaySpeed36').onchange=e=>{r.delay=Number(e.target.value);if(r.auto)scheduleReplay();};
   if($('replayExit36'))$('replayExit36').onclick=()=>d.close();
   if($('replayRestart36'))$('replayRestart36').onclick=()=>manual(()=>{r.index=0;});
   if($('replayReview36'))$('replayReview36').onclick=()=>{d.close();window.DiamondUI.openReview();};
+  if(focused){const available=e=>e&&!e.disabled&&!e.closest('[hidden]');let target=$(focused);if(!available(target))target=r.auto?$('replayAuto36'):end?$('replayExit36'):null;if(available(target))target.focus({preventScroll:true});}
  }
  function matchCard(){
   const root=card('recentMatchStory',$('screen-league')),match=state.league?.last;root.hidden=school()||!match;if(root.hidden)return;

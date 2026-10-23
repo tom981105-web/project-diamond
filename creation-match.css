@@ -91,3 +91,14 @@
  .career-ui #matchReplayDialog {width:100%; max-width:100%; margin:0; inset:0; border-radius:0}
  .career-ui #matchReplayDialog .replay-field svg {max-height:170px}
 }
+/* Keep the chosen original portrait centered and all six options visible. */
+.career-ui .avatar-preview {width:100%; height:160px; margin:22px 0 14px; display:flex; align-items:center; justify-content:center; gap:24px}
+.career-ui .avatar-preview::after {content:'내 선수의 모습'; font-size:16px; color:#304761; font-weight:600}
+.career-ui .avatar-preview :is(img,svg) {position:static; inset:auto; width:88px; height:132px; max-height:132px; object-fit:contain}
+.career-ui .avatar-grid {grid-template-columns:repeat(3,minmax(0,1fr))}
+.career-ui .avatar-choice {aspect-ratio:auto; height:110px; max-height:110px}
+@media(max-width:600px) {
+ .career-ui .avatar-preview {height:140px}
+ .career-ui .avatar-preview :is(img,svg) {height:112px; max-height:112px; width:75px}
+ .career-ui .avatar-choice {height:94px; max-height:94px}
+}

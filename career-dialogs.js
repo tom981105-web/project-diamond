@@ -36,7 +36,7 @@
  function terms(o){
   const m=market(),a=state.contract15.active,continuing=m.kind==='continue';
   const start=state.year+1,end=continuing?a.endYear:state.year+o.years;
-  return '<p class="decision-club">'+escapeHtml(o.team)+'</p><p class="screen-intro">'+escapeHtml(V5_NAMES[o.region])+' · '+(continuing?'기존 계약 유지':'다음 시즌 계약 제안')+'</p><div class="decision-rows">'+row('연봉',money(o.amount))+row('적용 기간',start+'–'+end+' · '+o.years+'시즌')+row(continuing?'잔여 기간 연봉 합계':'계약 총액',money(o.amount*o.years))+row('예상 역할',roles[o.role])+row('현재 소속',state.team)+row('현재 연봉',money(a.annualSalary))+'</div><p class="decision-note">예상 역할은 출전 보장이 아닙니다. 실제 기용은 실력·몸 상태·최근 성적과 함께 계산합니다.</p>'+(continuing?'<p class="decision-note">계약 종료 연도와 연봉을 유지합니다. 새 계약이나 추가 협상은 발생하지 않습니다.</p>':'<p class="decision-note">'+escapeHtml(o.negotiation?.reason||'협상 전 제안입니다. 구단별로 한 번 조건 개선을 요청할 수 있습니다.')+'</p>');
+  return '<p class="decision-club">'+escapeHtml(o.team)+'</p><p class="screen-intro">'+escapeHtml(V5_NAMES[o.region])+' · '+(continuing?'기존 계약 유지':'다음 시즌 계약 제안')+'</p><div class="decision-rows">'+row('연봉',money(o.amount))+row('적용 기간',start+'–'+end+' · '+o.years+'시즌')+row(continuing?'잔여 기간 연봉 합계':'계약 총액',money(o.amount*o.years))+row('예상 역할',roles[o.role])+'</div><details class="contract-comparison34"><summary>현재 계약과 비교</summary>'+row('현재 소속',state.team)+row('현재 연봉',money(a.annualSalary))+'</details><p class="decision-note">예상 역할은 출전 보장이 아닙니다. 실제 기용은 실력·몸 상태·최근 성적과 함께 계산합니다.</p>'+(continuing?'<p class="decision-note">계약 종료 연도와 연봉을 유지합니다. 새 계약이나 추가 협상은 발생하지 않습니다.</p>':'<p class="decision-note">'+escapeHtml(o.negotiation?.reason||'협상 전 제안입니다. 구단별로 한 번 조건 개선을 요청할 수 있습니다.')+'</p>');
  }
  function paint(){
   const c=context;if(!c)return;
@@ -58,7 +58,7 @@
    actions.innerHTML='<button type="button" class="secondary" id="cancelCareerAdvance">돌아가서 검토</button><button type="button" id="confirmCareerAdvance">'+(retiring?'은퇴 확정':'이 조건으로 다음 시즌 시작')+'</button>';
    if(!retiring){
     const signature=document.createElement('section');signature.className='signature-panel';
-    signature.innerHTML='<h3>나의 계약에 서명하기</h3><p class="decision-note">손으로 사인을 그리거나 선수 이름을 입력해 주세요. 게임 속 계약 확인입니다.</p><canvas id="careerSignature" width="640" height="150" aria-label="사인 그리기 영역"></canvas><label for="signatureName">이름으로 서명</label><input id="signatureName" maxlength="20" autocomplete="off" placeholder="'+escapeHtml(state.name)+'"><button type="button" id="clearSignature" class="secondary small">다시 서명</button>';
+    signature.innerHTML='<h3>나의 계약에 서명하기</h3><p class="decision-note">손으로 사인을 그리거나 선수 이름을 입력해 주세요. 게임 속 계약 확인입니다.</p><canvas id="careerSignature" width="640" height="150" aria-label="사인 그리기 영역"></canvas><div class="signature-name-row34"><label for="signatureName">이름으로 서명</label><input id="signatureName" maxlength="20" autocomplete="off" placeholder="'+escapeHtml(state.name)+'"><button type="button" id="clearSignature" class="secondary small">다시 서명</button></div>';
     body.append(signature);const canvas=$('careerSignature'),ctx=canvas.getContext('2d');ctx.strokeStyle='#263342';ctx.lineWidth=3;ctx.lineCap='round';let drawing=false,points=0;
     const ready=()=>{$('confirmCareerAdvance').disabled=!c.signed;};
     canvas.onpointerdown=e=>{drawing=true;points=0;canvas.setPointerCapture(e.pointerId);const box=canvas.getBoundingClientRect();ctx.beginPath();ctx.moveTo((e.clientX-box.left)*canvas.width/box.width,(e.clientY-box.top)*canvas.height/box.height);};

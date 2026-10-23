@@ -18,7 +18,7 @@ for(const role of ['batter','pitcher'])test(`broadcast navigation shows recorded
  await page.setViewportSize({width:390,height:640});await start(page,role);
  const before=await page.evaluate(()=>({state:JSON.stringify(state),saved:localStorage.getItem(KEY),match:state.league.last}));
  await page.evaluate(()=>{window.broadcastRandomCalls=0;Math.random=()=>{window.broadcastRandomCalls++;return .65;};});
- await page.click('#openMatchReplay');await expect(page.locator('#replayPrevious35')).toBeDisabled();await page.click('#replayNext');await page.click('#replayPrevious35');await expect(page.locator('#replayProgress35')).toHaveAttribute('value','1');
+ await page.click('#openMatchReplay');await expect(page.locator('#replayMine35')).toHaveText(role==='batter'?'내 타석으로':'내 투구로');await expect(page.locator('#replayPrevious35')).toBeDisabled();await page.click('#replayNext');await page.click('#replayPrevious35');await expect(page.locator('#replayProgress35')).toHaveAttribute('value','1');
  if(await page.locator('#replayMine35').isEnabled()){await page.click('#replayMine35');await expect(page.locator('.replay-call')).toContainText(role==='batter'?'내 타석':'내 투구');}
  expect(await page.locator('#matchReplayDialog > .experience-body').evaluate(e=>e.scrollTop)).toBe(0);
  const footer=await page.locator('#matchReplayDialog > .decision-actions').boundingBox();expect(footer.y+footer.height).toBeLessThanOrEqual(640);

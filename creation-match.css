@@ -102,3 +102,6 @@
  .career-ui .avatar-preview :is(img,svg) {height:112px; max-height:112px; width:75px}
  .career-ui .avatar-choice {height:94px; max-height:94px}
 }
+@media(min-width:601px) {
+ .career-ui .avatar-grid {grid-template-columns:repeat(6,minmax(0,1fr))}
+}

@@ -179,7 +179,9 @@
   if(!$('wizardProgress'))return;
   for(const section of document.querySelectorAll('.wizard-step'))section.hidden=Number(section.dataset.step)!==wizardStep;
   $('wizardProgress').innerHTML=Array.from({length:4},(_,i)=>'<span class="'+(i<=wizardStep?'active':'')+'"></span>').join('');
-  $('wizardCount').textContent=(wizardStep+1)+' / 4';$('wizardTitle').textContent=['나의 유니폼','선수의 첫 페이지','어떤 선수로 자랄까요?','집중할 성장 방향'][wizardStep];
+  $('wizardCount').textContent=(wizardStep+1)+' / 4';$('createForm').dataset.step=wizardStep;
+  $('wizardProgress').setAttribute('role','progressbar');$('wizardProgress').setAttribute('aria-label','선수 생성 단계');$('wizardProgress').setAttribute('aria-valuemin','1');$('wizardProgress').setAttribute('aria-valuemax','4');$('wizardProgress').setAttribute('aria-valuenow',String(wizardStep+1));
+  $('wizardKicker35').textContent=['나만의 선수','이름과 출발점','플레이 스타일','첫 훈련 계획'][wizardStep];$('wizardTitle').textContent=['나의 유니폼','선수의 첫 페이지','어떤 선수로 자랄까요?','집중할 성장 방향'][wizardStep];
   $('wizardNext').hidden=wizardStep===3;$('createForm').querySelector('button[type=submit]').hidden=wizardStep!==3;
   $('wizardBack').textContent=wizardStep===0?'처음으로':'이전';
   if(wizardStep===3){const role=$('role').value,first=$('journeyFocus'),second=$('journeyFocusSecond'),keep=first.dataset.role===role,previous=first.value,previousSecond=second.value;first.innerHTML=ATTR[role].map((x,i)=>'<option value="'+i+'">'+x+'</option>').join('');second.innerHTML='<option value="-1">한 가지에 집중</option>'+ATTR[role].map((x,i)=>'<option value="'+i+'">'+x+'</option>').join('');if(keep){first.value=previous;second.value=previousSecond;}first.dataset.role=role;$('wizardSummary').textContent=$('playerName').value+' · '+$('position').value+' · '+$('hand').value+' · '+(document.querySelector('[name=amateurPath]:checked')?.value==='college'?'대학 야구에서 시작':'프로 신인으로 시작');}
@@ -187,14 +189,14 @@
  function wizard(){
   const form=$('createForm');if($('wizardProgress'))return;
   const original=[...form.children],submit=form.querySelector('button[type=submit]');
-  const progress=element('div','wizardProgress','','wizard-progress'),meta=element('div',null,'<button type="button" id="wizardBack">처음으로</button><span id="wizardCount"></span>','wizard-meta'),title=element('h2','wizardTitle');form.prepend(progress,meta,title);
+  const progress=element('div','wizardProgress','','wizard-progress'),meta=element('div',null,'<button type="button" id="wizardBack">처음으로</button><span id="wizardCount"></span>','wizard-meta'),title=element('h2','wizardTitle');form.prepend(meta,progress,element('p','wizardKicker35','','flow-eyebrow'),title);
   const steps=Array.from({length:4},(_,i)=>{const s=element('section',null,'','wizard-step');s.dataset.step=i;form.append(s);return s;});
   steps[0].innerHTML='<p class="screen-intro">그라운드에서 나를 나타낼 모습을 골라 주세요.<br>외형은 선수 능력에 영향을 주지 않습니다.</p><div class="avatar-grid">'+colors.map((_,i)=>'<button type="button" class="avatar-choice'+(i===0?' selected':'')+'" data-avatar="'+i+'" aria-label="선수 모습 '+(i+1)+'">'+portrait(i)+'</button>').join('')+'</div>';
   for(const e of original){if(e===submit)continue;if(e.id==='diamondProspects')steps[2].append(e);else steps[1].append(e);}
   steps[3].innerHTML='<p class="screen-intro">두 과제는 프로 12경기·대학 4경기 단위로 번갈아 훈련합니다.<br>한 과제에 집중할 수도 있습니다.</p><div class="field"><label for="journeyFocus">첫 번째 훈련 과제</label><select id="journeyFocus"></select></div><div class="field"><label for="journeyFocusSecond">두 번째 훈련 과제</label><select id="journeyFocusSecond"></select></div><p class="wizard-summary" id="wizardSummary"></p>';
   const buttons=element('div',null,'<button type="button" id="wizardNext">다음 단계</button>','wizard-buttons');buttons.append(submit);form.append(buttons);submit.textContent='나의 야구 인생 시작';
   $('wizardBack').onclick=()=>{if(wizardStep===0){started=false;layout();}else{wizardStep--;paintWizard();}};
-  $('wizardNext').onclick=()=>{if(wizardStep===1&&!$('playerName').value.trim()){$('formError').textContent='선수 이름을 입력해 주세요.';$('playerName').focus();return;}wizardStep=Math.min(3,wizardStep+1);paintWizard();window.scrollTo(0,0);};
+  $('wizardNext').onclick=()=>{if(wizardStep===1&&(!$('playerName').value.trim()||!$('playerName').checkValidity())){$('formError').textContent='선수 이름을 1~20자로 입력해 주세요.';$('playerName').focus();return;}$('formError').textContent='';wizardStep=Math.min(3,wizardStep+1);paintWizard();window.scrollTo(0,0);};
   for(const b of steps[0].querySelectorAll('[data-avatar]'))b.onclick=()=>{selectedAvatar=Number(b.dataset.avatar);for(const x of steps[0].querySelectorAll('button'))x.classList.toggle('selected',x===b);};
   form.addEventListener('submit',()=>{
    if(!state||state.game!==0||state.career.length)return;

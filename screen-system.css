@@ -287,3 +287,9 @@ body.career-ui {
 .career-ui .signature-name-row34 label {grid-column:1/-1; font-size:12px; color:#8190a5}
 .career-ui .signature-name-row34 input {margin:0; min-height:44px}
 .career-ui .signature-name-row34 button {font-size:12px; min-height:44px}
+/* Contract actions occupy their own row, never covering the scrollable signature. */
+.career-ui :is(#careerAdvanceDialog,#contractDetailDialog)[open] {display:flex; flex-direction:column; overflow:hidden; min-height:0}
+.career-ui :is(#careerAdvanceDialog,#contractDetailDialog)>.dialog-top {position:static; flex-shrink:0}
+.career-ui :is(#careerAdvanceDialog,#contractDetailDialog)>h2 {flex-shrink:0}
+.career-ui :is(#careerAdvanceDialog,#contractDetailDialog)>.decision-content {min-height:0; flex:1 1 auto; overflow:auto; overscroll-behavior:contain; padding-right:2px}
+.career-ui :is(#careerAdvanceDialog,#contractDetailDialog)>.decision-actions {position:static; flex:0 0 auto; margin:0; padding:16px 0 calc(8px + env(safe-area-inset-bottom))}

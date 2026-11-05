@@ -6,11 +6,11 @@ for(let avatar=0;avatar<6;avatar++)test(`avatar ${avatar+1} keeps its own atlas 
  }
 });
 for(const role of ['batter','pitcher'])test(`${role} left-handed preparation mirrors the correct pose`,async({page})=>{
- await create(page);await page.evaluate(role=>{state.role=role;state.hand='좌투좌타';render();},role);await page.click('#openPlayerScene27');const pose=page.locator('#playerSceneDialog27 .action-pose28');await expect(pose).toBeVisible();expect(await pose.evaluate(e=>getComputedStyle(e).transform)).toBe('matrix(-1, 0, 0, 1, 0, 0)');
+ await create(page);await page.evaluate(role=>{state.role=role;state.hand='좌투좌타';render();},role);await page.click('#openPlayerScene27');const pose=page.locator('#playerSceneDialog27 .player-motion37');await expect(pose).toBeVisible();expect(await pose.evaluate(e=>getComputedStyle(e).transform)).toBe('matrix(-1, 0, 0, 1, 0, 0)');
 });
 test('defensive practice keeps the actual original portrait and does not claim swinging',async({page})=>{
  await create(page);await page.evaluate(()=>{state.development.focus=4;state.career14.plan={mode:'practice',focus:4,intensity:'normal',end:7};render();});await page.click('#openPlayerScene27');await expect(page.locator('#playerSceneDialog27 .action-pose28')).toHaveCount(0);await expect(page.locator('#playerSceneDialog27 .scene-portrait28')).toBeVisible();
 });
 test('failed action image loading leaves the selected original portrait visible',async({page})=>{
- await page.route('**/assets/actions/*.png',r=>r.abort());await create(page,2);const failed=page.waitForEvent('requestfailed',r=>r.url().includes('/assets/actions/'));await page.click('#openPlayerScene27');await failed;await expect(page.locator('#playerSceneDialog27 .scene-portrait28')).toBeVisible();await expect(page.locator('#playerSceneDialog27 .action-pose28')).not.toBeVisible();await expect(page.locator('#playerSceneDialog27 .scene-portrait28')).toHaveAttribute('src',/avatar-03.webp/);
+ await page.route('**/assets/actions/*.png',r=>r.abort());await page.route('**/assets/motion/**',r=>r.abort());await create(page,2);const failed=page.waitForEvent('requestfailed',r=>r.url().includes('/assets/actions/'));await page.click('#openPlayerScene27');await failed;await expect(page.locator('#playerSceneDialog27 .scene-portrait28')).toBeVisible();await expect(page.locator('#playerSceneDialog27 .action-pose28')).not.toBeVisible();await expect(page.locator('#playerSceneDialog27 .scene-portrait28')).toHaveAttribute('src',/avatar-03.webp/);
 });

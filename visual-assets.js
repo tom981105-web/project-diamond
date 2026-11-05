@@ -6,3 +6,6 @@ window.DiamondVisualAssets={portraits:['./assets/portraits/avatar-01.webp','./as
 
 // V2.8: original identity-preserving three-pose atlases (swing, windup, seated rest).
 window.DiamondVisualAssets.actions=Array.from({length:6},(_,i)=>'./assets/actions/avatar-0'+(i+1)+'.png');
+
+// V3.7: selected-player animations. WebP playback, transparent GIF fallback, still posters.
+window.DiamondVisualAssets.motion=Array.from({length:6},(_,i)=>Object.fromEntries(["swing","pitch","rest"].map(kind=>{const base="./assets/motion/avatar-0"+(i+1)+"-"+kind;return [kind,{webp:base+".webp",gif:base+".gif",poster:base+"-still.webp"}];})));

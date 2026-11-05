@@ -1,0 +1,32 @@
+/* Keep the selected character visible while motion assets load or fail. */
+.player-motion37{object-fit:contain;visibility:hidden;pointer-events:none}
+.player-motion37.motion-loaded37{visibility:visible}
+.player-scene27>.player-motion37{position:absolute;z-index:3;width:166px;height:166px;left:calc(50% - 83px);bottom:0;animation:none!important}
+.player-scene27.motion-ready37>.scene-portrait28,.player-scene27.motion-ready37>.action-pose28{visibility:hidden}
+.motion-left37{transform:scaleX(-1)}
+.career-ui .motion-toggle37{position:absolute;right:7px;top:7px;z-index:4;min-height:36px;min-width:92px;border-radius:10px;padding:6px 10px;background:#fffef3e8;color:#415675;border:1px solid #c5d2df;font-size:11px;font-weight:600;box-shadow:none}
+.career-ui .motion-toggle37:focus-visible{outline:3px solid #3478eb;outline-offset:2px}
+.career-ui .motion-toggle37:disabled{opacity:1;color:#637383;background:#f3f5f8}
+#runPlayerScene27 .player-scene27>.player-motion37{width:112px;height:112px;left:calc(50% - 56px);bottom:0}
+.replay-field{position:relative}
+.replay-action37{position:absolute;inset:0;pointer-events:none}
+.replay-action37>.player-motion37{position:absolute;width:clamp(105px,28%,184px);height:auto;aspect-ratio:1;bottom:0;left:50%;translate:-50% 0}
+.replay-action37>span{position:absolute;top:12px;left:12px;font-size:11px;color:#3c6650;background:#fffffff0;padding:6px 9px;border-radius:9px}
+.replay-action37>.motion-toggle37{pointer-events:auto}
+.recap-overall30[data-growth37=true]{position:relative;isolation:isolate}
+.growth-glint37{position:absolute;inset:8px 18%;z-index:-1;pointer-events:none;display:flex;justify-content:space-between;align-items:center;color:#e4af47;font-size:27px}
+.recap-champion30{position:relative}
+.recap-champion30::before{content:'✦';display:inline-block;margin-right:5px;color:#b28224}
+html[data-motion37=playing] .growth-glint37{animation:glint37 1.8s ease-in-out 3}
+html[data-motion37=playing] .recap-champion30::before{animation:champion37 1.5s ease-in-out 3}
+@keyframes glint37{0%,100%{opacity:.35;scale:.9}50%{opacity:1;scale:1.08}}
+@keyframes champion37{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(10deg) scale(1.15)}}
+@media(max-width:600px){
+ .player-scene27>.player-motion37{width:150px;height:150px;left:calc(50% - 75px)}
+ #runPlayerScene27 .player-scene27>.player-motion37{width:98px;height:98px;left:calc(50% - 49px)}
+ .replay-action37>span{top:5px;left:5px;font-size:10px;padding:5px 6px}
+ .replay-action37>.motion-toggle37{top:4px;right:4px;min-width:86px}
+}
+@media(prefers-reduced-motion:reduce){.growth-glint37,.recap-champion30::before{animation:none!important}}
+
+.recap30{position:relative}.recap30>.motion-toggle37{top:7px;right:7px}html[data-motion37=paused] .player-scene27>img{animation:none!important}

@@ -6,6 +6,7 @@
  let owner=null;
  const atlases=new Map();
  function pose(s){
+  if(s.noSwing)return null;
   if(['rest','rehab'].includes(s.mode))return 2;
   if(s.mode==='retired')return null;
   if(s.mode==='practice'&&state.role==='batter'&&state.development.focus>=3)return null;
@@ -25,6 +26,7 @@
   if(d.injury>0)return {mode:'rehab',title:'회복을 준비하는 시간',detail:'남은 부상 기간 '+d.injury+'팀 경기 · 재활과 공식 복귀 일정을 먼저 확인합니다.'};
   if(active&&['rest','rehab'].includes(p.mode))return {mode:'rest',title:'몸을 쉬게 하는 시간',detail:'확정한 회복 계획 '+(p.end-state.game)+'팀 경기 남음'};
   if(state.v12?.college&&!state.v12.college.completed)return {mode:'practice',title:'대학 무대에서 준비하며',detail:state.v12.college.results.length+' / 36경기 · 훈련과 실전으로 프로를 준비합니다.'};
+  if(active&&p.mode==='defense')return {mode:'practice',noSwing:state.role==='batter',title:state.role==='batter'?'수비 훈련을 준비하며':'변화구 훈련을 준비하며',detail:'확정한 훈련 계획 '+(p.end-state.game)+'팀 경기 남음'};
   if(active&&p.mode==='practice')return {mode:'practice',title:'함께 정한 과제를 준비하며',detail:'확정한 훈련 계획 '+(p.end-state.game)+'팀 경기 남음'};
   if(d.level==='2군')return {mode:'practice',title:'다음 기회를 향한 훈련',detail:'현재 2군 · 훈련과 기용 평가를 이어갑니다.'};
   return {mode:state.role==='pitcher'?'pitcher':'batter',title:state.role==='pitcher'?'다음 등판을 준비하며':'다음 타석을 준비하며',detail:'현재 컨디션 '+Math.round(d.condition)+' · 피로 '+Math.round(d.fatigue)};

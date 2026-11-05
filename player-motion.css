@@ -29,4 +29,4 @@ html[data-motion37=playing] .recap-champion30::before{animation:champion37 1.5s 
 }
 @media(prefers-reduced-motion:reduce){.growth-glint37,.recap-champion30::before{animation:none!important}}
 
-.recap30{position:relative}.recap30>.motion-toggle37{top:7px;right:7px}html[data-motion37=paused] .player-scene27>img{animation:none!important}
+.recap30{position:relative}.career-ui .recap30>.motion-toggle37{position:static;display:block;margin:0 0 8px auto}html[data-motion37=paused] .player-scene27>img{animation:none!important}
